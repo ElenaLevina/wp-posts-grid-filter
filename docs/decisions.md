@@ -1,0 +1,127 @@
+# Architecture decisions
+
+Short records of the main technical decisions in this plugin: the context, the options I considered, what I chose and what it costs. The README links here for the details.
+
+---
+
+## ADR-001 — Content model: prefixed post type and taxonomies
+
+**Context.** The brief says the grid "displays posts", but also asks for a unique prefix for the "post type and any custom taxonomy names". These two lines can be read in two ways.
+
+**Options.**
+1. A custom post type (`elvpg_post`) with custom taxonomies (`elvpg_category`, `elvpg_tag`).
+2. Core `post` with core `category` and `post_tag`.
+
+**Decision.** Option 1. It follows the prefix requirement literally and keeps the demo content isolated: on a site that already has posts, the grid and the filters still show exactly the seeded data, and uninstall can remove only what the plugin created.
+
+**Consequences.** The blocks read the post type and taxonomy names through filters (`elvpg_post_type`, `elvpg_category_taxonomy`, `elvpg_tag_taxonomy`), so switching to core posts, categories and tags is a one-line change in a theme or mu-plugin.
+
+---
+
+## ADR-002 — Inter-block communication: Interactivity API, with the URL as the single source of truth
+
+**Context.** The filter and the grid are siblings. They can be placed anywhere on the page, in any order, and must stay in sync. Block context does not work here, because it only flows from a parent to its inner blocks.
+
+**Options.**
+1. **Interactivity API + `@wordpress/interactivity-router`.** The filter writes its state to the URL and asks the router to navigate. The router fetches the server-rendered page and replaces only the grid's router region.
+2. Custom DOM events + a REST endpoint that returns posts as JSON, rendered again in JavaScript.
+3. A shared global JS object or `localStorage`.
+
+**Decision.** Option 1.
+- The URL (`?elvpg_cat=…&elvpg_tag=…&elvpg_page=…`) is the only state. It gives shareable links, a working back button, and the same result after a page refresh.
+- The markup of a post card lives in one place: the PHP render callback. Nothing is rendered twice in JavaScript.
+- It is the standard WordPress way for front-end block interactivity since 6.5, and it works no matter where each block sits on the page.
+- It degrades gracefully: without JavaScript the filter is a plain GET form and the pagination is plain links (see ADR-006).
+
+**Consequences.** Requires WordPress 6.5+. Each filter change makes a request for a full server-rendered page. This is acceptable for this use case, and the router prefetches pagination links on hover. Options 2 and 3 would avoid this request, but would duplicate rendering logic in JavaScript and lose the URL state.
+
+---
+
+## ADR-003 — Rendering: dynamic blocks on the front end, React preview in the editor
+
+**Context.** Posts must load dynamically. In the editor the block still needs a live preview.
+
+**Options for the editor preview.**
+1. `ServerSideRender` — the editor requests the PHP markup from the server.
+2. A React preview that reads posts from the `core` data store with `useSelect` / `getEntityRecords`.
+
+**Decision.** Front end: dynamic blocks with `render.php`. Editor: option 2. It reacts instantly to the Inspector controls, uses the editor's data cache, and the WordPress team recommends it over `ServerSideRender` for new blocks.
+
+**Consequences.** The card markup exists twice: in `render.php` and in the editor component. They share class names and one stylesheet, so they look the same. This duplication is a deliberate tradeoff.
+
+---
+
+## ADR-004 — Pagination as an inner block
+
+**Context.** Pagination must be an inner block of the grid. WordPress renders inner blocks **before** their parent, so the pagination block cannot receive the parent's `WP_Query` object directly.
+
+**Decision.**
+- `elvpg/posts-pagination` is a separate block with `"parent": ["elvpg/posts-grid"]`, so it can only live inside a grid.
+- The grid shares its settings (posts per page, a grid id) with the pagination through **block context** (`providesContext` / `usesContext`).
+- Both blocks call one query service, `Elvpg_Query`, with the same arguments. The service keeps a static per-request cache, so the database query runs only once.
+- The page number uses its own query var, `elvpg_page`, not `paged`. On a static page WordPress already uses `page`/`paged` for its own pagination, and a custom var avoids conflicts with the theme and with other blocks. It also works with any permalink structure, including plain permalinks.
+
+**Consequences.** When the filters change, the page resets to 1. A page number beyond the last page shows the empty state with a link back to the first page.
+
+---
+
+## ADR-005 — Filter logic: OR within a type, AND across types
+
+**Decision.** The query service builds one `tax_query`:
+
+```php
+array(
+    'relation' => 'AND',
+    array( 'taxonomy' => 'elvpg_category', 'field' => 'term_id', 'terms' => $categories, 'operator' => 'IN' ),
+    array( 'taxonomy' => 'elvpg_tag',      'field' => 'term_id', 'terms' => $tags,       'operator' => 'IN' ),
+)
+```
+
+`IN` gives OR inside one filter type, and `relation => AND` gives AND across types. A type with no selection adds no clause. No selection at all shows every post.
+
+The builder is a pure function (term IDs in, query args out), so it is covered by fast unit tests that do not need WordPress (ADR-009).
+
+---
+
+## ADR-006 — Progressive enhancement and accessibility
+
+**Decision.**
+- The filter is a real `<form method="get">` with checkboxes in `<fieldset>`/`<legend>` groups and a submit button. With JavaScript, changes apply instantly and the button is hidden. Without JavaScript, the form submits and the server renders the filtered grid.
+- Pagination is a `<nav>` with real links and `aria-current="page"`.
+- After a client-side update, a polite `aria-live` region announces the number of results, and focus moves to the grid when the page changes.
+- Empty state: "No posts match these filters" with a "Clear filters" link.
+
+---
+
+## ADR-007 — Demo content seeding
+
+**Decision.**
+- Seeding runs in the activation hook. The post type is registered there explicitly, because `init` has already fired for that request.
+- Everything the plugin creates is marked with the `_elvpg_demo` meta key. Activating again does not create duplicates.
+- Featured images are bundled in `assets/seed/` and imported as real attachments with generated sizes and alt text. Activation needs no network access.
+- **Multisite.** On network activation the seeder runs on every site with `switch_to_blog()`. Sites created later get the demo content through the `wp_initialize_site` hook.
+
+**Consequences.** On very large networks, seeding every site during one request could time out. A WP-CLI command or a background queue would be the next step; this is listed under known limitations.
+
+---
+
+## ADR-008 — Deactivation and uninstall
+
+**Decision.** Deactivation keeps all content and only flushes rewrite rules: deactivating a plugin should never delete a user's data. `uninstall.php` removes only the content marked with `_elvpg_demo` (posts, attachments, the demo page) and the plugin's options, on every site of a network.
+
+---
+
+## ADR-009 — Testing strategy
+
+**Decision.**
+- **Unit tests (PHPUnit)** for the query builder: categories only, tags only, both, empty input, invalid input. This covers the core rule of the brief.
+- **Linting:** WordPress Coding Standards via PHPCS; `wp-scripts lint-js` and `lint-style`.
+- **Manual checklist** in the README for the UI: filter combinations with expected results, pagination, no-JS mode, keyboard use, block placement in different orders.
+
+Full end-to-end tests were left out on purpose. They would add setup time and fragility without much extra confidence for a project of this size.
+
+---
+
+## ADR-010 — Delivery
+
+**Decision.** A GitHub repository with step-by-step commits, plus a release zip that **includes the compiled `build/` folder**. This way the plugin works right after "Upload → Activate" with no `npm` step. The minimum requirements are WordPress 6.5 and PHP 7.4.
