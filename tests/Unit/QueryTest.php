@@ -146,4 +146,30 @@ class QueryTest extends TestCase {
 		$this->assertSame( 2, $args['paged'] );
 		$this->assertSame( array( 7, 9 ), $args['tax_query'][1]['terms'] );
 	}
+
+	/* ---------- pagination_items ---------- */
+
+	/**
+	 * @dataProvider pagination_cases
+	 *
+	 * @param int   $current  Current page.
+	 * @param int   $total    Total pages.
+	 * @param array $expected Expected items, null is a gap.
+	 */
+	public function test_pagination_items( $current, $total, $expected ) {
+		$this->assertSame( $expected, Elvpg_Query::pagination_items( $current, $total ) );
+	}
+
+	public function pagination_cases() {
+		return array(
+			'no posts'                => array( 1, 0, array() ),
+			'one page has no links'   => array( 1, 1, array() ),
+			'short list shows all'    => array( 2, 7, array( 1, 2, 3, 4, 5, 6, 7 ) ),
+			'long list, first page'   => array( 1, 10, array( 1, 2, null, 10 ) ),
+			'long list, middle'       => array( 5, 10, array( 1, null, 4, 5, 6, null, 10 ) ),
+			'long list, last page'    => array( 10, 10, array( 1, null, 9, 10 ) ),
+			'one-page gap is filled'  => array( 3, 10, array( 1, 2, 3, 4, null, 10 ) ),
+			'page beyond the end'     => array( 99, 10, array( 1, null, 9, 10 ) ),
+		);
+	}
 }

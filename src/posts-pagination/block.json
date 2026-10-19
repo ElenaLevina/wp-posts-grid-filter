@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elvpg/posts-pagination",
+	"version": "1.0.0",
+	"title": "Posts Pagination",
+	"category": "widgets",
+	"icon": "controls-forward",
+	"description": "Page links for the Posts Grid. Can only be placed inside a Posts Grid.",
+	"textdomain": "elvpg-posts-grid-filter",
+	"parent": [ "elvpg/posts-grid" ],
+	"usesContext": [ "elvpg/postsPerPage" ],
+	"supports": {
+		"html": false,
+		"multiple": false,
+		"reusable": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}

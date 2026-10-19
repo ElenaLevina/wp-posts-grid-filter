@@ -63,7 +63,10 @@ Short records of the main technical decisions in this plugin: the context, the o
 - Both blocks call one query service, `Elvpg_Query`, with the same arguments. The service keeps a static per-request cache, so the database query runs only once.
 - The page number uses its own query var, `elvpg_page`, not `paged`. On a static page WordPress already uses `page`/`paged` for its own pagination, and a custom var avoids conflicts with the theme and with other blocks. It also works with any permalink structure, including plain permalinks.
 
-**Consequences.** When the filters change, the page resets to 1. A page number beyond the last page shows the empty state with a link back to the first page.
+- The page numbers come from `Elvpg_Query::pagination_items()`, a pure function with unit tests. Short lists show every page; long lists show the first and last page, the current page with its neighbours, and "…" for skipped pages: `1 … 5 6 7 … 12`.
+- In the editor, the pagination preview reads "posts per page" from the same block context, so it shows the real number of pages and updates as soon as the grid setting changes.
+
+**Consequences.** When the filters change, the page resets to 1. A page number beyond the last page shows the empty state with a "Clear filters" link, which also removes the page number. Page links keep the current filters and change only `elvpg_page`; page 1 has no page parameter, so each page has one URL.
 
 ---
 

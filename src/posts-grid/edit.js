@@ -8,7 +8,9 @@
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	InspectorControls,
+	store as blockEditorStore,
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
@@ -20,8 +22,10 @@ import { COLUMNS, POSTS_PER_PAGE, SETTINGS } from './constants';
 import PostCard from './post-card';
 
 const ALLOWED_BLOCKS = [ 'elvpg/posts-pagination' ];
+// A new grid starts with pagination. It can be removed and added back.
+const TEMPLATE = [ [ 'elvpg/posts-pagination' ] ];
 
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { columns, postsPerPage } = attributes;
 
 	const { posts, isLoading, termNames, media } = useSelect(
@@ -78,9 +82,21 @@ export default function Edit( { attributes, setAttributes } ) {
 		style: { '--elvpg-columns': columns },
 	} );
 
+	// The "+" button is shown only when the pagination was removed.
+	const hasPagination = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ) > 0,
+		[ clientId ]
+	);
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'elvpg-grid__inner' },
-		{ allowedBlocks: ALLOWED_BLOCKS }
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			template: TEMPLATE,
+			renderAppender: hasPagination
+				? false
+				: InnerBlocks.ButtonBlockAppender,
+		}
 	);
 
 	return (
