@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elvpg/posts-grid",
+	"version": "1.0.0",
+	"title": "Posts Grid",
+	"category": "widgets",
+	"icon": "grid-view",
+	"description": "Shows posts in a responsive grid. Works together with the Posts Filter block anywhere on the page.",
+	"keywords": [ "posts", "grid", "filter" ],
+	"textdomain": "elvpg-posts-grid-filter",
+	"attributes": {
+		"columns": {
+			"type": "number",
+			"default": 3
+		},
+		"postsPerPage": {
+			"type": "number",
+			"default": 6
+		}
+	},
+	"providesContext": {
+		"elvpg/postsPerPage": "postsPerPage"
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}

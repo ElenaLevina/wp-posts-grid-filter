@@ -22,8 +22,10 @@ define( 'ELVPG_DIR', plugin_dir_path( __FILE__ ) );
 require_once ELVPG_DIR . 'includes/class-elvpg-content-types.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-seeder.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-query.php';
+require_once ELVPG_DIR . 'includes/class-elvpg-blocks.php';
 
 add_action( 'init', array( 'Elvpg_Content_Types', 'register' ) );
+add_action( 'init', array( 'Elvpg_Blocks', 'register' ) );
 
 // Multisite: seed sites created after network activation. Priority 900 runs
 // after core has created the new site's tables and default content.

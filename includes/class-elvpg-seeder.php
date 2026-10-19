@@ -331,7 +331,7 @@ class Elvpg_Seeder {
 				'<!-- wp:heading --><h2 class="wp-block-heading">' . esc_html__( 'Explore the posts', 'elvpg-posts-grid-filter' ) . '</h2><!-- /wp:heading -->',
 				'<!-- wp:elvpg/posts-filter /-->',
 				'<!-- wp:paragraph --><p>' . esc_html__( 'The filter above and the grid below are independent blocks. Move either one anywhere on the page and they still stay in sync.', 'elvpg-posts-grid-filter' ) . '</p><!-- /wp:paragraph -->',
-				'<!-- wp:elvpg/posts-grid {"columns":3,"postsPerPage":6} -->' . "\n" . '<!-- wp:elvpg/posts-pagination /-->' . "\n" . '<!-- /wp:elvpg/posts-grid -->',
+				'<!-- wp:elvpg/posts-grid {"columns":3,"postsPerPage":6,"align":"wide"} -->' . "\n" . '<!-- wp:elvpg/posts-pagination /-->' . "\n" . '<!-- /wp:elvpg/posts-grid -->',
 			)
 		);
 

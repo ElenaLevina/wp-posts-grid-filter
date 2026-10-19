@@ -1,0 +1,24 @@
+{
+	"name": "elvpg-posts-grid-filter",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Posts Grid and Posts Filter Gutenberg blocks synced through the Interactivity API.",
+	"license": "GPL-2.0-or-later",
+	"author": "Elena Levin",
+	"engines": {
+		"node": ">=20.19.0"
+	},
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php",
+		"start": "wp-scripts start --webpack-copy-php",
+		"lint:js": "wp-scripts lint-js src",
+		"lint:css": "wp-scripts lint-style \"src/**/*.scss\"",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"test:php": "wp-env run cli --env-cwd=wp-content/plugins/elvpg-posts-grid-filter composer test"
+	},
+	"devDependencies": {
+		"@wordpress/env": "11.15.0",
+		"@wordpress/scripts": "35.0.0"
+	}
+}
