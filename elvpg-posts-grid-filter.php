@@ -21,6 +21,7 @@ define( 'ELVPG_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once ELVPG_DIR . 'includes/class-elvpg-content-types.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-seeder.php';
+require_once ELVPG_DIR . 'includes/class-elvpg-query.php';
 
 add_action( 'init', array( 'Elvpg_Content_Types', 'register' ) );
 

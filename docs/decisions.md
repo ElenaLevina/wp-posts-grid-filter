@@ -81,6 +81,14 @@ array(
 
 `IN` gives OR inside one filter type, and `relation => AND` gives AND across types. A type with no selection adds no clause. No selection at all shows every post.
 
+**Input from the URL.** The filter state comes from public GET parameters, so it is treated as untrusted:
+- `parse_ids()` accepts both `elvpg_cat=3,5` (the URL the JavaScript filter builds) and `elvpg_cat[]=3&elvpg_cat[]=5` (what the HTML form sends without JavaScript). Anything that is not a positive whole number is dropped. IDs are sorted and unique, so the same selection always gives the same cache key.
+- `parse_page()` turns any invalid page number into 1.
+- `clamp_per_page()` keeps "posts per page" between 1 and 24, so a hand-edited block attribute cannot request thousands of posts.
+- No nonce is needed: this is a public, read-only request, like a search form.
+
+**Extensibility.** The final arguments pass through the `elvpg_query_args` filter, so a site can change the ordering or add a meta query without editing the plugin.
+
 The builder is a pure function (term IDs in, query args out), so it is covered by fast unit tests that do not need WordPress (ADR-009).
 
 ---
@@ -122,7 +130,8 @@ Posts and terms that users added themselves stay in the database. This follows t
 ## ADR-009 — Testing strategy
 
 **Decision.**
-- **Unit tests (PHPUnit)** for the query builder: categories only, tags only, both, empty input, invalid input. This covers the core rule of the brief.
+- **Unit tests (PHPUnit 9.6, the last version that supports PHP 7.4)** for the query builder: categories only, tags only, both, empty input, invalid input. This covers the core rule of the brief. The tests do not load WordPress, so they run in milliseconds.
+- **Integration check during development:** every combination of up to two categories and up to two tags (319 combinations) was run through a real `WP_Query` and compared with the expected result computed by hand from the seeded data. It is a one-off script, not part of the repository: the unit tests guard the logic, and this check confirmed that WordPress reads the generated `tax_query` the way we expect.
 - **Linting:** WordPress Coding Standards via PHPCS; `wp-scripts lint-js` and `lint-style`.
 - **Manual checklist** in the README for the UI: filter combinations with expected results, pagination, no-JS mode, keyboard use, block placement in different orders.
 
