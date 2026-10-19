@@ -47,6 +47,8 @@ Short records of the main technical decisions in this plugin: the context, the o
 
 **Decision.** Front end: dynamic blocks with `render.php`. Editor: option 2. It reacts instantly to the Inspector controls, uses the editor's data cache, and the WordPress team recommends it over `ServerSideRender` for new blocks.
 
+**Filtering in the editor.** The Posts Filter block shows a static preview in the editor (the real category and tag checkboxes), but it does not filter the grid preview. The brief asks for a *front-end* filtering UI, and the editor is for building and styling the page, not for browsing content. Connecting them in the editor would add state that has no meaning for the saved page.
+
 **Consequences.** The card markup exists twice: in `render.php` and in the editor component. They share class names and one stylesheet, so they look the same. This duplication is a deliberate tradeoff.
 
 ---
