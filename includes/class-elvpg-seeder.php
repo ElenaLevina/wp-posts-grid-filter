@@ -20,8 +20,77 @@ class Elvpg_Seeder {
 
 	/**
 	 * Activation callback.
+	 *
+	 * @param bool $network_wide True when a super admin activates the plugin
+	 *                           for the whole network on Multisite.
 	 */
-	public static function activate() {
+	public static function activate( $network_wide = false ) {
+		if ( is_multisite() && $network_wide ) {
+			self::for_each_site( array( __CLASS__, 'seed_site' ) );
+			return;
+		}
+
+		self::seed_site();
+	}
+
+	/**
+	 * Deactivation callback. Content stays (ADR-008); only rewrite rules are reset.
+	 *
+	 * @param bool $network_wide True on network deactivation.
+	 */
+	public static function deactivate( $network_wide = false ) {
+		if ( is_multisite() && $network_wide ) {
+			self::for_each_site( array( __CLASS__, 'reset_rewrite_rules' ) );
+			return;
+		}
+
+		self::reset_rewrite_rules();
+	}
+
+	/**
+	 * Seeds a site created after the plugin was network-activated.
+	 * Hooked to `wp_initialize_site`, which runs when the new site's tables exist.
+	 *
+	 * @param WP_Site $site The new site.
+	 */
+	public static function on_new_site( $site ) {
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		if ( ! is_plugin_active_for_network( plugin_basename( ELVPG_FILE ) ) ) {
+			return;
+		}
+
+		switch_to_blog( (int) $site->blog_id );
+		self::seed_site();
+		restore_current_blog();
+	}
+
+	/**
+	 * Runs a callback on every site of the network.
+	 *
+	 * @param callable $callback Called once per site, while switched to it.
+	 */
+	private static function for_each_site( $callback ) {
+		$site_ids = get_sites(
+			array(
+				'fields' => 'ids',
+				'number' => 0,
+			)
+		);
+
+		foreach ( $site_ids as $site_id ) {
+			switch_to_blog( (int) $site_id );
+			call_user_func( $callback );
+			restore_current_blog();
+		}
+	}
+
+	/**
+	 * Seeds the current site: terms, posts, demo page.
+	 */
+	public static function seed_site() {
 		// Post types are registered on `init`, which already ran before activation.
 		Elvpg_Content_Types::register();
 
@@ -32,6 +101,22 @@ class Elvpg_Seeder {
 		}
 
 		self::seed_page();
+		self::reset_rewrite_rules();
+	}
+
+	/**
+	 * Makes WordPress rebuild the rewrite rules, so the new post type URLs work.
+	 *
+	 * After switch_to_blog() the global $wp_rewrite still holds the permalink
+	 * settings of the original site, so flushing there would save wrong rules.
+	 * Deleting the option is safe: WordPress rebuilds the rules on that
+	 * site's next request.
+	 */
+	public static function reset_rewrite_rules() {
+		if ( is_multisite() && ms_is_switched() ) {
+			delete_option( 'rewrite_rules' );
+			return;
+		}
 
 		flush_rewrite_rules();
 	}
@@ -43,13 +128,13 @@ class Elvpg_Seeder {
 	 */
 	private static function terms() {
 		return array(
-			Elvpg_Content_Types::TAX_CATEGORY => array(
+			Elvpg_Content_Types::category_taxonomy() => array(
 				'development'   => 'Development',
 				'design'        => 'Design',
 				'performance'   => 'Performance',
 				'accessibility' => 'Accessibility',
 			),
-			Elvpg_Content_Types::TAX_TAG      => array(
+			Elvpg_Content_Types::tag_taxonomy()      => array(
 				'react'     => 'React',
 				'php'       => 'PHP',
 				'gutenberg' => 'Gutenberg',
@@ -104,6 +189,8 @@ class Elvpg_Seeder {
 
 				if ( ! is_wp_error( $created ) ) {
 					$ids[ $taxonomy ][ $slug ] = (int) $created['term_id'];
+					// Only terms created here are marked, so uninstall never removes a term the site already had.
+					add_term_meta( (int) $created['term_id'], self::DEMO_META_KEY, 1, true );
 				}
 			}
 		}
@@ -119,7 +206,7 @@ class Elvpg_Seeder {
 	private static function has_demo_posts() {
 		$found = get_posts(
 			array(
-				'post_type'      => Elvpg_Content_Types::POST_TYPE,
+				'post_type'      => Elvpg_Content_Types::post_type(),
 				'post_status'    => 'any',
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
@@ -141,7 +228,7 @@ class Elvpg_Seeder {
 
 			$post_id = wp_insert_post(
 				array(
-					'post_type'    => Elvpg_Content_Types::POST_TYPE,
+					'post_type'    => Elvpg_Content_Types::post_type(),
 					'post_status'  => 'publish',
 					'post_title'   => $title,
 					'post_excerpt' => $excerpt,
@@ -157,8 +244,11 @@ class Elvpg_Seeder {
 				continue;
 			}
 
-			wp_set_object_terms( $post_id, self::map_ids( $categories, $term_ids[ Elvpg_Content_Types::TAX_CATEGORY ] ), Elvpg_Content_Types::TAX_CATEGORY );
-			wp_set_object_terms( $post_id, self::map_ids( $tags, $term_ids[ Elvpg_Content_Types::TAX_TAG ] ), Elvpg_Content_Types::TAX_TAG );
+			$category_tax = Elvpg_Content_Types::category_taxonomy();
+			$tag_tax      = Elvpg_Content_Types::tag_taxonomy();
+
+			wp_set_object_terms( $post_id, self::map_ids( $categories, $term_ids[ $category_tax ] ?? array() ), $category_tax );
+			wp_set_object_terms( $post_id, self::map_ids( $tags, $term_ids[ $tag_tax ] ?? array() ), $tag_tax );
 
 			$image_id = self::import_image( sprintf( 'demo-%02d.jpg', $index + 1 ), $post_id, $title );
 

@@ -14,7 +14,7 @@ Short records of the main technical decisions in this plugin: the context, the o
 
 **Decision.** Option 1. It follows the prefix requirement literally and keeps the demo content isolated: on a site that already has posts, the grid and the filters still show exactly the seeded data, and uninstall can remove only what the plugin created.
 
-**Consequences.** The blocks read the post type and taxonomy names through filters (`elvpg_post_type`, `elvpg_category_taxonomy`, `elvpg_tag_taxonomy`), so switching to core posts, categories and tags is a one-line change in a theme or mu-plugin.
+**Consequences.** The blocks read the post type and taxonomy names through filters (`elvpg_post_type`, `elvpg_category_taxonomy`, `elvpg_tag_taxonomy`), so switching to core posts, categories and tags takes three short filters in a theme or mu-plugin. When a name is switched, the plugin does not register its own type or taxonomy, and the demo content is seeded into the core ones.
 
 ---
 
@@ -101,7 +101,8 @@ The builder is a pure function (term IDs in, query args out), so it is covered b
 - Seeding runs in the activation hook. The post type is registered there explicitly, because `init` has already fired for that request.
 - Everything the plugin creates is marked with the `_elvpg_demo` meta key. Activating again does not create duplicates.
 - Featured images are bundled in `assets/seed/` and imported as real attachments with generated sizes and alt text. Activation needs no network access.
-- **Multisite.** On network activation the seeder runs on every site with `switch_to_blog()`. Sites created later get the demo content through the `wp_initialize_site` hook.
+- **Multisite.** On network activation the seeder runs on every site with `switch_to_blog()`. Sites created later get the demo content through the `wp_initialize_site` hook (priority 900, after core has created the site's tables).
+- **Rewrite rules on Multisite.** After `switch_to_blog()` the global `$wp_rewrite` still holds the permalink settings of the original site, so `flush_rewrite_rules()` would save wrong rules for the other sites. On a switched site the seeder deletes the `rewrite_rules` option instead, and WordPress rebuilds the rules on that site's next request.
 
 **Consequences.** On very large networks, seeding every site during one request could time out. A WP-CLI command or a background queue would be the next step; this is listed under known limitations.
 
@@ -109,7 +110,12 @@ The builder is a pure function (term IDs in, query args out), so it is covered b
 
 ## ADR-008 — Deactivation and uninstall
 
-**Decision.** Deactivation keeps all content and only flushes rewrite rules: deactivating a plugin should never delete a user's data. `uninstall.php` removes only the content marked with `_elvpg_demo` (posts, attachments, the demo page) and the plugin's options, on every site of a network.
+**Decision.** Deactivation keeps all content and only resets rewrite rules: deactivating a plugin should never delete a user's data. `uninstall.php` removes only what the plugin created, on every site of a network:
+- posts, attachments (with their files) and the demo page marked with the `_elvpg_demo` post meta;
+- terms marked with the `_elvpg_demo` term meta. Only terms the seeder created get this mark. A term that already existed on the site is reused but never marked, so it is never deleted;
+- the `elvpg_demo_page_id` option.
+
+Posts and terms that users added themselves stay in the database. This follows the usual WordPress practice: deleting a plugin should not silently delete the site owner's own work.
 
 ---
 

@@ -24,5 +24,9 @@ require_once ELVPG_DIR . 'includes/class-elvpg-seeder.php';
 
 add_action( 'init', array( 'Elvpg_Content_Types', 'register' ) );
 
+// Multisite: seed sites created after network activation. Priority 900 runs
+// after core has created the new site's tables and default content.
+add_action( 'wp_initialize_site', array( 'Elvpg_Seeder', 'on_new_site' ), 900 );
+
 register_activation_hook( __FILE__, array( 'Elvpg_Seeder', 'activate' ) );
-register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
+register_deactivation_hook( __FILE__, array( 'Elvpg_Seeder', 'deactivate' ) );
