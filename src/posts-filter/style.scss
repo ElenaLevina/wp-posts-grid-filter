@@ -38,6 +38,16 @@
 	stroke-width: 2;
 }
 
+// Focus rings for keyboard users only. Themes often outline every focused
+// element, which also leaves a ring after a mouse click.
+.elvpg-filter__toggle,
+.elvpg-filter__link {
+
+	&:focus:not(:focus-visible) {
+		outline: none;
+	}
+}
+
 .elvpg-filter__dropdowns {
 	display: flex;
 	flex-wrap: wrap;
@@ -141,6 +151,13 @@
 		height: 1.125rem;
 		margin: 0;
 		accent-color: currentcolor;
+
+		// Themes often outline any focused element (Twenty Twenty-Five does).
+		// A square outline around the rounded checkbox left white gaps in the
+		// corners. Keyboard focus is shown on the whole option row instead.
+		&:focus {
+			outline: none;
+		}
 	}
 
 	&:hover {

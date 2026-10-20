@@ -288,6 +288,11 @@
 	}
 }
 
+// Focus ring for keyboard users only: themes often add one on click too.
+.elvpg-empty__action:focus:not(:focus-visible) {
+	outline: none;
+}
+
 .elvpg-empty__action {
 	display: inline-flex;
 	gap: 0.375rem;

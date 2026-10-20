@@ -33,6 +33,11 @@
 	}
 }
 
+// Focus ring for keyboard users only: themes often add one on click too.
+.elvpg-pagination__link:focus:not(:focus-visible) {
+	outline: none;
+}
+
 .elvpg-pagination__link {
 	display: inline-flex;
 	gap: 0.25rem;
