@@ -266,6 +266,7 @@
 
 		.elvpg-filter__dropdowns {
 			flex-wrap: nowrap;
+			gap: 0.5rem;
 			order: 3;
 			width: 100%;
 		}
@@ -276,13 +277,27 @@
 			min-width: 0;
 		}
 
+		// Each button gets half of the row. Smaller paddings, and the badge
+		// and the chevron never shrink: if the space is still too small,
+		// only the label is shortened with an ellipsis, nothing overflows.
 		.elvpg-filter__toggle {
+			gap: 0.375rem;
 			width: 100%;
-			justify-content: space-between;
+			padding: 0 0.625rem;
+			font-size: 0.875rem;
 
 			> span:first-child {
+				flex: 0 1 auto;
+				min-width: 0;
 				margin-right: auto;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
+		}
+
+		.elvpg-filter__badge,
+		.elvpg-filter__chevron {
+			flex: none;
 		}
 
 		.elvpg-filter__panel {
@@ -290,6 +305,24 @@
 			right: 0;
 			min-width: 0;
 			margin-top: 0.375rem;
+		}
+	}
+}
+
+// Very narrow container (small phones, about 320px): half a row is too small
+// for "Categories" with a badge, so the buttons stack, each full width, and
+// each panel opens right under its own button.
+@container (max-width: 18rem) {
+
+	.elvpg-filter.is-enhanced {
+
+		.elvpg-filter__dropdowns {
+			flex-direction: column;
+		}
+
+		.elvpg-filter__dropdown {
+			position: relative;
+			width: 100%;
 		}
 	}
 }
