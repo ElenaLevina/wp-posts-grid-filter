@@ -3,7 +3,7 @@
  * Plugin Name:       ELVPG Posts Grid & Filter
  * Description:       Two Gutenberg blocks — a dynamic Posts Grid with inner-block pagination and a Posts Filter — that stay in sync through the Interactivity API. Seeds demo content on activation.
  * Version:           1.0.0
- * Requires at least: 6.5
+ * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Elena Levin
  * License:           GPL-2.0-or-later

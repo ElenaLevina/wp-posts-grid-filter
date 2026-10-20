@@ -29,11 +29,11 @@ Detailed reasoning for every technical decision is in [docs/decisions.md](docs/d
 
 | | Minimum | Notes |
 |---|---|---|
-| WordPress | 6.5 | Interactivity API with client-side navigation |
+| WordPress | 6.6 | The blocks' editor scripts use the React JSX runtime that WordPress ships since 6.6 |
 | PHP | 7.4 | Checked with PHPCompatibilityWP |
 | Theme | any | A block theme is recommended. On WordPress 6.7+ with a block theme, the demo page uses a wide page template from the plugin |
 
-Tested with WordPress 6.8 and Twenty Twenty-Five.
+Tested with WordPress 6.8 (Twenty Twenty-Five) and with the minimum version, 6.6 (Twenty Twenty-Four).
 
 ## Installation
 
@@ -140,7 +140,7 @@ Why this approach:
 - **One source of markup.** A card is rendered in one place, `render.php`. A REST + JavaScript approach would have to build the same card again in JavaScript.
 - **Shareable and reversible.** The URL can be bookmarked or shared, and Back/Forward work.
 - **Progressive enhancement.** Without JavaScript the same URL parameters come from a plain GET form.
-- **It is the standard WordPress way** for front-end block interactivity since 6.5.
+- **It is the standard WordPress way** for front-end block interactivity (Interactivity API, WordPress 6.5+).
 
 Alternatives considered: custom DOM events with a REST endpoint returning JSON, or a shared global JS object. Both would avoid a full-page request, but would duplicate rendering in JavaScript and lose the URL state.
 
@@ -192,7 +192,7 @@ Both blocks are **dynamic**: `render.php` builds the markup on every request, so
 
 ## Known limitations
 
-- **Demo page layout on older setups.** The wide demo page template needs WordPress 6.7+ and a block theme with header and footer template parts. Otherwise the demo page uses the theme's default page template, and the content sits in the theme's normal column.
+- **Demo page layout on WordPress 6.6 or with other themes.** The wide demo page template needs WordPress 6.7+ and a block theme with header and footer template parts. Otherwise the demo page uses the theme's default page template, and the content sits in the theme's normal column.
 - **One URL state per page.** All grids on a page follow the same filter. Two independent filter-and-grid pairs on one page are not supported.
 - **Term IDs in the URL.** Shared links work on the same site; they are not portable between sites. Slugs would be more readable, at the cost of extra term lookups.
 - **Large networks.** On Multisite, network activation seeds every site in one request. On a very large network this could time out; a WP-CLI command or a background queue would be the next step.

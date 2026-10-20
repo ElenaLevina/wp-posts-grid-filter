@@ -16,7 +16,7 @@
 	<rule ref="WordPress"/>
 
 	<!-- The plugin's minimum WordPress version. Flags functions that are newer. -->
-	<config name="minimum_wp_version" value="6.5"/>
+	<config name="minimum_wp_version" value="6.6"/>
 
 	<!-- Every translatable string must use the plugin's text domain. -->
 	<rule ref="WordPress.WP.I18n">
