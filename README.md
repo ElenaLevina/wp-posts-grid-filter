@@ -39,7 +39,7 @@ Tested with WordPress 7.1 and 6.8 (Twenty Twenty-Five) and with the minimum vers
 
 ### Option A — the release zip (no build step)
 
-1. Download `elvpg-posts-grid-filter.zip` from the GitHub release.
+1. Download `elvpg-posts-grid-filter.zip` from the [latest GitHub release](https://github.com/ElenaLevina/wp-posts-grid-filter/releases/latest).
 2. In WordPress: **Plugins → Add New Plugin → Upload Plugin**, choose the zip, **Install Now**, **Activate**.
 3. Open **Pages → Posts Grid & Filter Demo** and view the page.
 
