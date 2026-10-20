@@ -6,3 +6,5 @@ build/
 .vscode/
 vendor/
 .phpunit.result.cache
+# Local wp-env settings, for example "phpVersion": "7.4" for a compatibility check.
+.wp-env.override.json

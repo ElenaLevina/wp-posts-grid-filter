@@ -214,6 +214,8 @@ Both blocks are **dynamic**: `render.php` builds the markup on every request, so
 
 The first time, install the PHP tools inside wp-env: `npm run composer -- install`.
 
+> **Do not delete the plugin from wp-admin in wp-env.** wp-env mounts this folder as the plugin folder, so **Plugins → Delete** runs `uninstall.php` and then deletes the source files, `.git` included. To test the uninstall, keep the files: `npx @wordpress/env run cli wp plugin uninstall elvpg-posts-grid-filter --skip-delete` (deactivate it first).
+
 `readme.txt` is the plugin readme in the WordPress.org format; this README is for GitHub. The release zip passes [Plugin Check](https://wordpress.org/plugins/plugin-check/). Run it on the source folder and it also lists development files (tests, configs, dotfiles); they are not part of the release.
 
 Testing approach ([ADR-009](docs/decisions.md#adr-009--testing-strategy)):

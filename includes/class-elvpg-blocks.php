@@ -20,7 +20,8 @@ class Elvpg_Blocks {
 		$block_files = glob( ELVPG_DIR . 'build/*/block.json' );
 
 		if ( empty( $block_files ) ) {
-			// Not built yet: run `npm run build`.
+			// Source code without the build, for example GitHub's "Source code (zip)".
+			add_action( 'admin_notices', array( __CLASS__, 'missing_build_notice' ) );
 			return;
 		}
 
@@ -29,6 +30,25 @@ class Elvpg_Blocks {
 		}
 
 		self::add_editor_settings();
+	}
+
+	/**
+	 * Admin notice when build/ is missing. Without it the plugin activates and
+	 * seeds the demo content, but the blocks show as "not supported" with no
+	 * explanation.
+	 */
+	public static function missing_build_notice() {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-error"><p><strong>%1$s</strong> %2$s <a href="%3$s">%4$s</a></p></div>',
+			esc_html__( 'ELVPG Posts Grid & Filter: the blocks are not built.', 'elvpg-posts-grid-filter' ),
+			esc_html__( 'This copy has no build/ folder. Install elvpg-posts-grid-filter.zip from the release (not "Source code"), or run npm install && npm run build.', 'elvpg-posts-grid-filter' ),
+			esc_url( 'https://github.com/ElenaLevina/wp-posts-grid-filter/releases/latest' ),
+			esc_html__( 'Download the release', 'elvpg-posts-grid-filter' )
+		);
 	}
 
 	/**
