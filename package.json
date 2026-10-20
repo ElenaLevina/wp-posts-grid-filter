@@ -9,8 +9,8 @@
 		"node": ">=20.19.0"
 	},
 	"scripts": {
-		"build": "wp-scripts build --webpack-copy-php",
-		"start": "wp-scripts start --webpack-copy-php",
+		"build": "wp-scripts build --webpack-copy-php --experimental-modules",
+		"start": "wp-scripts start --webpack-copy-php --experimental-modules",
 		"lint:js": "wp-scripts lint-js src",
 		"lint:css": "wp-scripts lint-style \"src/**/*.scss\"",
 		"env:start": "wp-env start",

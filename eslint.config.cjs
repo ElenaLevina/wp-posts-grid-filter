@@ -16,6 +16,7 @@ module.exports = [
 				'@wordpress/block-editor',
 				'@wordpress/blocks',
 				'@wordpress/components',
+				'@wordpress/compose',
 				'@wordpress/core-data',
 				'@wordpress/data',
 				'@wordpress/html-entities',

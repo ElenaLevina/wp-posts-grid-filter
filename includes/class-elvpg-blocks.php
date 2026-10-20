@@ -31,6 +31,41 @@ class Elvpg_Blocks {
 	}
 
 	/**
+	 * Number of grids rendered in this request.
+	 *
+	 * @var int
+	 */
+	private static $grid_count = 0;
+
+	/**
+	 * Router region id for the next grid on the page: elvpg-grid-1, elvpg-grid-2…
+	 * The router matches regions by id between the old and the new page, so the
+	 * id must be stable across requests. The position of the block is.
+	 *
+	 * @return string
+	 */
+	public static function next_grid_region_id() {
+		++self::$grid_count;
+
+		return 'elvpg-grid-' . self::$grid_count;
+	}
+
+	/**
+	 * Current URL without the filter and page parameters.
+	 *
+	 * @return string
+	 */
+	public static function clear_filters_url() {
+		return remove_query_arg(
+			array(
+				Elvpg_Query::VAR_CATEGORIES,
+				Elvpg_Query::VAR_TAGS,
+				Elvpg_Query::VAR_PAGE,
+			)
+		);
+	}
+
+	/**
 	 * Gives the editor script the post type and taxonomy names, because a
 	 * site can change them with filters (ADR-001). The REST bases are the
 	 * field names of the taxonomies on a post in the REST API.

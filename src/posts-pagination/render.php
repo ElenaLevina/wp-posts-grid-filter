@@ -51,7 +51,7 @@ $elvpg_wrapper = get_block_wrapper_attributes(
 	<ul class="elvpg-pagination__list">
 		<?php if ( $elvpg_current > 1 ) : ?>
 			<li>
-				<a class="elvpg-pagination__link elvpg-pagination__prev" href="<?php echo esc_url( $elvpg_page_url( $elvpg_current - 1 ) ); ?>" rel="prev">
+				<a class="elvpg-pagination__link elvpg-pagination__prev" data-wp-on--click="actions.goToPage" data-wp-on--mouseenter="actions.prefetchPage" href="<?php echo esc_url( $elvpg_page_url( $elvpg_current - 1 ) ); ?>" rel="prev">
 					<?php esc_html_e( 'Previous', 'elvpg-posts-grid-filter' ); ?>
 				</a>
 			</li>
@@ -68,7 +68,7 @@ $elvpg_wrapper = get_block_wrapper_attributes(
 				</li>
 			<?php else : ?>
 				<li>
-					<a class="elvpg-pagination__link" href="<?php echo esc_url( $elvpg_page_url( $elvpg_item ) ); ?>">
+					<a class="elvpg-pagination__link" data-wp-on--click="actions.goToPage" data-wp-on--mouseenter="actions.prefetchPage" href="<?php echo esc_url( $elvpg_page_url( $elvpg_item ) ); ?>">
 						<span class="screen-reader-text"><?php esc_html_e( 'Page', 'elvpg-posts-grid-filter' ); ?> </span><?php echo (int) $elvpg_item; ?>
 					</a>
 				</li>
@@ -77,7 +77,7 @@ $elvpg_wrapper = get_block_wrapper_attributes(
 
 		<?php if ( $elvpg_current < $elvpg_total ) : ?>
 			<li>
-				<a class="elvpg-pagination__link elvpg-pagination__next" href="<?php echo esc_url( $elvpg_page_url( $elvpg_current + 1 ) ); ?>" rel="next">
+				<a class="elvpg-pagination__link elvpg-pagination__next" data-wp-on--click="actions.goToPage" data-wp-on--mouseenter="actions.prefetchPage" href="<?php echo esc_url( $elvpg_page_url( $elvpg_current + 1 ) ); ?>" rel="next">
 					<?php esc_html_e( 'Next', 'elvpg-posts-grid-filter' ); ?>
 				</a>
 			</li>

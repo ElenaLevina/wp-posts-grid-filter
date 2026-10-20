@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elvpg/posts-filter",
+	"version": "1.0.0",
+	"title": "Posts Filter",
+	"category": "widgets",
+	"icon": "filter",
+	"description": "Filters the Posts Grid by categories and tags. Place it anywhere on the same page as the grid.",
+	"keywords": [ "posts", "filter", "categories", "tags" ],
+	"textdomain": "elvpg-posts-grid-filter",
+	"attributes": {
+		"showCategories": {
+			"type": "boolean",
+			"default": true
+		},
+		"showTags": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"interactivity": true,
+		"align": [ "wide", "full" ],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

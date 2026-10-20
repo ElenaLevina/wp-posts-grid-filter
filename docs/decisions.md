@@ -33,6 +33,13 @@ Short records of the main technical decisions in this plugin: the context, the o
 - It is the standard WordPress way for front-end block interactivity since 6.5, and it works no matter where each block sits on the page.
 - It degrades gracefully: without JavaScript the filter is a plain GET form and the pagination is plain links (see ADR-006).
 
+**Implementation details.**
+- The filter never talks to the grid. It builds a URL and calls `navigateTo()` from `src/shared/navigation.js`; the grid reads the URL on the server. Every grid on the page follows the same URL.
+- The router matches regions by id between the old and the new page, so the id must be stable across requests. It is based on the grid's position on the page: `elvpg-grid-1`, `elvpg-grid-2`…
+- The router module is loaded with a dynamic `import()` on the first interaction, so the initial page load stays small.
+- The filter's checkboxes are outside the router region, so they are not re-rendered. A `data-wp-watch` callback keeps them in line with the URL after Back/Forward and after "Clear filters" in the grid's empty state.
+- If the user clicks quickly, the router ignores responses from older navigations, so the grid always shows the latest selection.
+
 **Consequences.** Requires WordPress 6.5+. Each filter change makes a request for a full server-rendered page. This is acceptable for this use case, and the router prefetches pagination links on hover. Options 2 and 3 would avoid this request, but would duplicate rendering logic in JavaScript and lose the URL state.
 
 ---
@@ -100,8 +107,11 @@ The builder is a pure function (term IDs in, query args out), so it is covered b
 
 **Decision.**
 - The filter is a real `<form method="get">` with checkboxes in `<fieldset>`/`<legend>` groups and a submit button. With JavaScript, changes apply instantly and the button is hidden. Without JavaScript, the form submits and the server renders the filtered grid.
-- Pagination is a `<nav>` with real links and `aria-current="page"`.
-- After a client-side update, a polite `aria-live` region announces the number of results, and focus moves to the grid when the page changes.
+- The form keeps the other parameters of the current URL as hidden fields. Without this, with plain permalinks (`?page_id=…`) a no-JS submit would leave the page.
+- The checkboxes are native inputs styled as chips, so keyboard and screen reader support comes from the browser. Focus stays on the checkbox after a change.
+- Pagination is a `<nav>` with real links and `aria-current="page"`. Ctrl/Cmd-click still opens a page in a new tab.
+- After a client-side update, a polite `aria-live` region announces the result ("4 posts found. Page 1 of 2."). When the page changes, focus moves to the top of the grid, so keyboard users do not stay at the bottom.
+- While the next page loads, the grid has `aria-busy="true"` and is dimmed. Smooth scrolling is turned off for users who prefer reduced motion.
 - Empty state: "No posts match these filters" with a "Clear filters" link.
 
 ---

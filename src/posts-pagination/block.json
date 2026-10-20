@@ -12,6 +12,7 @@
 	"usesContext": [ "elvpg/postsPerPage" ],
 	"supports": {
 		"html": false,
+		"interactivity": true,
 		"multiple": false,
 		"reusable": false
 	},
