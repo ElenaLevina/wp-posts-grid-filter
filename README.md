@@ -33,7 +33,7 @@ Detailed reasoning for every technical decision is in [docs/decisions.md](docs/d
 | PHP | 7.4 | Checked with PHPCompatibilityWP |
 | Theme | any | A block theme is recommended. On WordPress 6.7+ with a block theme, the demo page uses a wide page template from the plugin |
 
-Tested with WordPress 6.8 (Twenty Twenty-Five) and with the minimum version, 6.6 (Twenty Twenty-Four).
+Tested with WordPress 7.1 and 6.8 (Twenty Twenty-Five) and with the minimum version, 6.6 (Twenty Twenty-Four).
 
 ## Installation
 
@@ -210,8 +210,11 @@ Both blocks are **dynamic**: `render.php` builds the markup on every request, so
 | `npm run lint:php` | PHPCS: WordPress Coding Standards + PHP 7.4 compatibility (runs in wp-env) |
 | `npm run test:php` | PHPUnit unit tests (runs in wp-env) |
 | `npm run env:start` / `env:stop` | Start / stop the local WordPress |
+| `npm run release` | Builds and creates `elvpg-posts-grid-filter.zip` with only the runtime files (PHP, `build/`, `assets/`, `readme.txt`) |
 
 The first time, install the PHP tools inside wp-env: `npm run composer -- install`.
+
+`readme.txt` is the plugin readme in the WordPress.org format; this README is for GitHub. The release zip passes [Plugin Check](https://wordpress.org/plugins/plugin-check/). Run it on the source folder and it also lists development files (tests, configs, dotfiles); they are not part of the release.
 
 Testing approach ([ADR-009](docs/decisions.md#adr-009--testing-strategy)):
 
