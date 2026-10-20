@@ -51,7 +51,7 @@ function Dropdown( { label, terms, isOpen, onToggle } ) {
 		>
 			<button
 				type="button"
-				className="elvpg-filter__toggle"
+				className="elvpg-filter__toggle has-background has-text-color"
 				aria-expanded={ isOpen }
 				aria-controls={ instanceId }
 				onClick={ onToggle }

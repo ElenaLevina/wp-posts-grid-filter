@@ -74,6 +74,17 @@ if ( $elvpg_pages > 1 ) {
 }
 
 $elvpg_category_tax = Elvpg_Content_Types::category_taxonomy();
+
+/*
+ * Some themes add an inline style with a fixed height to every image
+ * (Twenty Twenty-One sets height:56.25%). An inline style beats the card
+ * CSS, so the image would not fill the card. The filter runs only while
+ * the cards are printed, so other images on the page keep the theme style.
+ */
+$elvpg_without_inline_style = static function ( $attr ) {
+	unset( $attr['style'] );
+	return $attr;
+};
 $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 ?>
 <div <?php echo $elvpg_wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped by get_block_wrapper_attributes(). ?>>
@@ -81,6 +92,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 	<p class="screen-reader-text" aria-live="polite" aria-atomic="true"><?php echo esc_html( $elvpg_status ); ?></p>
 
 	<?php if ( $elvpg_query->have_posts() ) : ?>
+		<?php add_filter( 'wp_get_attachment_image_attributes', $elvpg_without_inline_style, PHP_INT_MAX ); ?>
 		<ul class="elvpg-grid__list">
 			<?php foreach ( $elvpg_query->posts as $elvpg_post ) : ?>
 				<?php
@@ -133,8 +145,15 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 							<?php if ( is_array( $elvpg_tags ) ) : ?>
 								<ul class="elvpg-card__tags" aria-label="<?php esc_attr_e( 'Tags', 'elvpg-posts-grid-filter' ); ?>">
 									<?php foreach ( $elvpg_tags as $elvpg_tag ) : ?>
-										<?php /* Shown as a hashtag of the slug, for example #ai-tools. */ ?>
-										<li class="elvpg-card__tag">#<?php echo esc_html( $elvpg_tag->slug ); ?></li>
+										<?php
+										/*
+										 * Shown as a hashtag of the slug, for example #ai-tools.
+										 * WordPress stores non-Latin slugs URL-encoded, so the slug is
+										 * decoded for display. dir="auto" keeps the # before the word
+										 * in both LTR and RTL text.
+										 */
+										?>
+										<li class="elvpg-card__tag" dir="auto">#<?php echo esc_html( urldecode( $elvpg_tag->slug ) ); ?></li>
 									<?php endforeach; ?>
 								</ul>
 							<?php endif; ?>
@@ -143,6 +162,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 				</li>
 			<?php endforeach; ?>
 		</ul>
+		<?php remove_filter( 'wp_get_attachment_image_attributes', $elvpg_without_inline_style, PHP_INT_MAX ); ?>
 	<?php else : ?>
 		<?php echo Elvpg_Empty_State::render( $elvpg_state ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside Elvpg_Empty_State. ?>
 	<?php endif; ?>

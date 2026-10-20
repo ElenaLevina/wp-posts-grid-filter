@@ -130,11 +130,19 @@ $elvpg_chevron_icon = '<svg class="elvpg-filter__chevron" viewBox="0 0 24 24" wi
 					$elvpg_param    = $elvpg_group['param'];
 					$elvpg_panel_id = $elvpg_uid . '-' . $elvpg_param;
 					?>
+					<?php
+					/*
+					 * The buttons have the core "has-background has-text-color" classes:
+					 * they tell classic themes that the element sets its own colors.
+					 * Without them, Twenty Twenty-One paints every button in its
+					 * primary color with a high-specificity selector.
+					 */
+					?>
 					<div class="elvpg-filter__dropdown" data-group="<?php echo esc_attr( $elvpg_param ); ?>" data-wp-class--is-open="context.open.<?php echo esc_attr( $elvpg_param ); ?>" data-wp-on--focusout="actions.closeOnFocusOut">
 						<?php /* Shown only with JavaScript (see style.scss). Without it the panel below is always visible. */ ?>
 						<button
 							type="button"
-							class="elvpg-filter__toggle"
+							class="elvpg-filter__toggle has-background has-text-color"
 							aria-expanded="false"
 							aria-controls="<?php echo esc_attr( $elvpg_panel_id ); ?>"
 							data-wp-bind--aria-expanded="context.open.<?php echo esc_attr( $elvpg_param ); ?>"
@@ -175,7 +183,7 @@ $elvpg_chevron_icon = '<svg class="elvpg-filter__chevron" viewBox="0 0 24 24" wi
 									);
 									?>
 								</span>
-								<button type="button" class="elvpg-filter__link" data-wp-on--click="actions.clearGroup">
+								<button type="button" class="elvpg-filter__link has-background has-text-color" data-wp-on--click="actions.clearGroup">
 									<?php esc_html_e( 'Clear', 'elvpg-posts-grid-filter' ); ?>
 								</button>
 							</div>

@@ -18,6 +18,20 @@ function toText( html ) {
 }
 
 /**
+ * Non-Latin slugs are stored URL-encoded (%d7%a2…); decode them for display.
+ *
+ * @param {string} slug Term slug.
+ * @return {string} Readable slug.
+ */
+function decodeSlug( slug ) {
+	try {
+		return decodeURIComponent( slug );
+	} catch {
+		return slug;
+	}
+}
+
+/**
  * Picks a medium-size image URL, falling back to the original file.
  *
  * @param {Object|undefined} image Media record from the core data store.
@@ -87,8 +101,12 @@ export default function PostCard( {
 					{ tags.length > 0 && (
 						<ul className="elvpg-card__tags">
 							{ tags.map( ( tag ) => (
-								<li key={ tag } className="elvpg-card__tag">
-									#{ tag }
+								<li
+									key={ tag }
+									className="elvpg-card__tag"
+									dir="auto"
+								>
+									#{ decodeSlug( tag ) }
 								</li>
 							) ) }
 						</ul>

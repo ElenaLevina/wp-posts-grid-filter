@@ -33,7 +33,7 @@ Detailed reasoning for every technical decision is in [docs/decisions.md](docs/d
 | PHP | 7.4 | Checked with PHPCompatibilityWP |
 | Theme | any | A block theme is recommended. On WordPress 6.7+ with a block theme, the demo page uses a wide page template from the plugin |
 
-Tested with WordPress 7.1 and 6.8 (Twenty Twenty-Five) and with the minimum version, 6.6 (Twenty Twenty-Four).
+Tested with WordPress 7.1 and 6.8 (Twenty Twenty-Five) and with the minimum version, 6.6 (Twenty Twenty-Four). Also checked with a classic theme (Twenty Twenty-One), on Multisite (subdirectories) and on an RTL site.
 
 ## Installation
 
