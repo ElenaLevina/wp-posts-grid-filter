@@ -54,15 +54,20 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				} ) ?? [] ),
 			];
 
-			const mediaById = {};
-			( records ?? [] ).forEach( ( post ) => {
-				if ( post.featured_media ) {
-					mediaById[ post.featured_media ] = core.getMedia(
-						post.featured_media,
-						{ context: 'view' }
-					);
-				}
-			} );
+			// All featured images of the preview in one request, not one per card.
+			const mediaIds = ( records ?? [] )
+				.map( ( post ) => post.featured_media )
+				.filter( Boolean );
+			const mediaRecords = mediaIds.length
+				? core.getEntityRecords( 'postType', 'attachment', {
+						include: mediaIds,
+						per_page: mediaIds.length,
+						context: 'view',
+					} )
+				: [];
+			const mediaById = Object.fromEntries(
+				( mediaRecords ?? [] ).map( ( item ) => [ item.id, item ] )
+			);
 
 			return {
 				posts: records,

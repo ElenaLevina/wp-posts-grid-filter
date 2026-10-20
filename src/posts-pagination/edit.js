@@ -64,13 +64,17 @@ function Pages( { layout, items } ) {
 export default function Edit( { context } ) {
 	const perPage = context[ 'elvpg/postsPerPage' ] ?? 6;
 
+	// Only the total is needed: one record per page, and the count comes
+	// from the X-WP-Total header of the same request.
 	const total = useSelect( ( select ) => {
-		const ids = select( coreStore ).getEntityRecords(
+		const core = select( coreStore );
+		const args = [
 			'postType',
 			SETTINGS.postType,
-			{ per_page: -1, status: 'publish', _fields: 'id' }
-		);
-		return ids?.length ?? 0;
+			{ per_page: 1, status: 'publish', _fields: 'id' },
+		];
+		core.getEntityRecords( ...args );
+		return core.getEntityRecordsTotalItems( ...args ) ?? 0;
 	}, [] );
 
 	const pages = Math.ceil( total / perPage );

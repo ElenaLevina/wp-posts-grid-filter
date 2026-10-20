@@ -52,7 +52,9 @@ foreach ( $_GET as $elvpg_key => $elvpg_value ) {
 	if ( in_array( $elvpg_key, array( Elvpg_Query::VAR_CATEGORIES, Elvpg_Query::VAR_TAGS, Elvpg_Query::VAR_PAGE ), true ) || ! is_string( $elvpg_value ) ) {
 		continue;
 	}
-	$elvpg_keep[ sanitize_key( $elvpg_key ) ] = sanitize_text_field( wp_unslash( $elvpg_value ) );
+	// The name is kept as it is (sanitize_key() would lowercase it and change
+	// the parameter). Both name and value are escaped when printed.
+	$elvpg_keep[ (string) $elvpg_key ] = sanitize_text_field( wp_unslash( $elvpg_value ) );
 }
 
 $elvpg_action = strtok( Elvpg_Blocks::clear_filters_url(), '?' );

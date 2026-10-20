@@ -67,13 +67,15 @@ class Elvpg_Blocks {
 	}
 
 	/**
-	 * Gives the editor script the post type and taxonomy names, because a
+	 * Gives the editor scripts the post type and taxonomy names, because a
 	 * site can change them with filters (ADR-001). The REST bases are the
 	 * field names of the taxonomies on a post in the REST API.
+	 *
+	 * Every block has its own editor script and reads the settings when the
+	 * script loads, so each script gets the same line. With only one of them,
+	 * a script that loads earlier would use the default names.
 	 */
 	private static function add_editor_settings() {
-		$handle = generate_block_asset_handle( 'elvpg/posts-grid', 'editorScript' );
-
 		$settings = array(
 			'postType'         => Elvpg_Content_Types::post_type(),
 			'categoryTaxonomy' => Elvpg_Content_Types::category_taxonomy(),
@@ -82,7 +84,11 @@ class Elvpg_Blocks {
 			'tagRestBase'      => self::rest_base( Elvpg_Content_Types::tag_taxonomy() ),
 		);
 
-		wp_add_inline_script( $handle, 'window.elvpgSettings = ' . wp_json_encode( $settings ) . ';', 'before' );
+		$script = 'window.elvpgSettings = ' . wp_json_encode( $settings ) . ';';
+
+		foreach ( array( 'elvpg/posts-filter', 'elvpg/posts-grid', 'elvpg/posts-pagination' ) as $block_name ) {
+			wp_add_inline_script( generate_block_asset_handle( $block_name, 'editorScript' ), $script, 'before' );
+		}
 	}
 
 	/**

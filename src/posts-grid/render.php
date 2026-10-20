@@ -18,7 +18,11 @@ $elvpg_per_page = Elvpg_Query::clamp_per_page( $attributes['postsPerPage'] ?? El
 $elvpg_columns  = min( 4, max( 2, (int) ( $attributes['columns'] ?? 3 ) ) );
 // Heading level of the post titles: h2–h6, h3 by default (see ADR-003).
 $elvpg_title_tag = 'h' . min( 6, max( 2, (int) ( $attributes['titleLevel'] ?? 3 ) ) );
-$elvpg_query     = Elvpg_Query::get_posts( $elvpg_per_page );
+$elvpg_state     = Elvpg_Query::current_state();
+$elvpg_query     = Elvpg_Query::get_posts( $elvpg_per_page, $elvpg_state );
+
+// Loads all featured images of the page in one query instead of two per card.
+update_post_thumbnail_cache( $elvpg_query );
 
 $elvpg_region_id = Elvpg_Blocks::next_grid_region_id();
 
@@ -140,7 +144,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 			<?php endforeach; ?>
 		</ul>
 	<?php else : ?>
-		<?php echo Elvpg_Empty_State::render( Elvpg_Query::current_state() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside Elvpg_Empty_State. ?>
+		<?php echo Elvpg_Empty_State::render( $elvpg_state ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside Elvpg_Empty_State. ?>
 	<?php endif; ?>
 
 	<?php if ( '' !== trim( $content ) ) : ?>
