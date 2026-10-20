@@ -52,6 +52,9 @@ export function filterUrl( categories, tags ) {
 		url.searchParams.set( PARAMS.tags, tags.join( ',' ) );
 	}
 
+	// Commas are valid in a query string. Keep them readable: ?elvpg_cat=3,5.
+	url.search = url.search.replace( /%2C/gi, ',' );
+
 	return url.toString();
 }
 

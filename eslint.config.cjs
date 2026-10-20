@@ -19,6 +19,7 @@ module.exports = [
 				'@wordpress/compose',
 				'@wordpress/core-data',
 				'@wordpress/data',
+				'@wordpress/element',
 				'@wordpress/html-entities',
 				'@wordpress/i18n',
 				'@wordpress/interactivity',
