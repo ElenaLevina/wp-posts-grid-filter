@@ -85,17 +85,17 @@ class QueryTest extends TestCase {
 
 	public function invalid_ids() {
 		return array(
-			'null'           => array( null ),
-			'empty string'   => array( '' ),
-			'zero'           => array( '0' ),
-			'negative'       => array( '-3' ),
-			'text'           => array( 'abc' ),
-			'mixed'          => array( '3abc' ),
-			'decimal'        => array( '2.5' ),
-			'sql'            => array( '1 OR 1=1' ),
-			'nested array'   => array( array( array( 3 ) ) ),
-			'boolean'        => array( true ),
-			'only commas'    => array( ',,,' ),
+			'null'         => array( null ),
+			'empty string' => array( '' ),
+			'zero'         => array( '0' ),
+			'negative'     => array( '-3' ),
+			'text'         => array( 'abc' ),
+			'mixed'        => array( '3abc' ),
+			'decimal'      => array( '2.5' ),
+			'sql'          => array( '1 OR 1=1' ),
+			'nested array' => array( array( array( 3 ) ) ),
+			'boolean'      => array( true ),
+			'only commas'  => array( ',,,' ),
 		);
 	}
 
@@ -162,14 +162,14 @@ class QueryTest extends TestCase {
 
 	public function pagination_cases() {
 		return array(
-			'no posts'                => array( 1, 0, array() ),
-			'one page has no links'   => array( 1, 1, array() ),
-			'short list shows all'    => array( 2, 7, array( 1, 2, 3, 4, 5, 6, 7 ) ),
-			'long list, first page'   => array( 1, 10, array( 1, 2, null, 10 ) ),
-			'long list, middle'       => array( 5, 10, array( 1, null, 4, 5, 6, null, 10 ) ),
-			'long list, last page'    => array( 10, 10, array( 1, null, 9, 10 ) ),
-			'one-page gap is filled'  => array( 3, 10, array( 1, 2, 3, 4, null, 10 ) ),
-			'page beyond the end'     => array( 99, 10, array( 1, null, 9, 10 ) ),
+			'no posts'               => array( 1, 0, array() ),
+			'one page has no links'  => array( 1, 1, array() ),
+			'short list shows all'   => array( 2, 7, array( 1, 2, 3, 4, 5, 6, 7 ) ),
+			'long list, first page'  => array( 1, 10, array( 1, 2, null, 10 ) ),
+			'long list, middle'      => array( 5, 10, array( 1, null, 4, 5, 6, null, 10 ) ),
+			'long list, last page'   => array( 10, 10, array( 1, null, 9, 10 ) ),
+			'one-page gap is filled' => array( 3, 10, array( 1, 2, 3, 4, null, 10 ) ),
+			'page beyond the end'    => array( 99, 10, array( 1, null, 9, 10 ) ),
 		);
 	}
 }

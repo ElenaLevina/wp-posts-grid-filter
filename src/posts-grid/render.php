@@ -26,17 +26,17 @@ wp_interactivity_state( 'elvpg/posts', array( 'isLoading' => false ) );
 
 $elvpg_wrapper = get_block_wrapper_attributes(
 	array(
-		'class'                   => 'elvpg-grid',
-		'style'                   => '--elvpg-columns:' . $elvpg_columns . ';',
+		'class'                     => 'elvpg-grid',
+		'style'                     => '--elvpg-columns:' . $elvpg_columns . ';',
 		// The router replaces this element after each navigation. The id must be
 		// the same on every page load, so it is based on the block's position.
-		'data-wp-interactive'     => 'elvpg/posts',
-		'data-wp-router-region'   => $elvpg_region_id,
-		'data-wp-context'         => wp_json_encode( array( 'regionId' => $elvpg_region_id ) ),
-		'data-wp-bind--aria-busy' => 'state.isLoading',
+		'data-wp-interactive'       => 'elvpg/posts',
+		'data-wp-router-region'     => $elvpg_region_id,
+		'data-wp-context'           => wp_json_encode( array( 'regionId' => $elvpg_region_id ) ),
+		'data-wp-bind--aria-busy'   => 'state.isLoading',
 		'data-wp-class--is-loading' => 'state.isLoading',
 		// Focus target after a page change (see view.js).
-		'tabindex'                => '-1',
+		'tabindex'                  => '-1',
 	)
 );
 
@@ -64,7 +64,7 @@ $elvpg_category_tax = Elvpg_Content_Types::category_taxonomy();
 $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 ?>
 <div <?php echo $elvpg_wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped by get_block_wrapper_attributes(). ?>>
-	<?php // Screen readers announce the new count after each client-side update. ?>
+	<?php /* Screen readers announce the new count after each client-side update. */ ?>
 	<p class="screen-reader-text" aria-live="polite" aria-atomic="true"><?php echo esc_html( $elvpg_status ); ?></p>
 
 	<?php if ( $elvpg_query->have_posts() ) : ?>
@@ -78,7 +78,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 				<li class="elvpg-card">
 					<article class="elvpg-card__inner">
 						<?php if ( has_post_thumbnail( $elvpg_post ) ) : ?>
-							<?php // The title link below is the main link. The image link is hidden from screen readers and the tab order, so it is not announced twice. ?>
+							<?php /* The title link is the main link. The image link is hidden from screen readers and the tab order, so it is not announced twice. */ ?>
 							<a class="elvpg-card__media" href="<?php echo esc_url( $elvpg_link ); ?>" tabindex="-1" aria-hidden="true">
 								<?php echo get_the_post_thumbnail( $elvpg_post, 'medium_large', array( 'loading' => 'lazy' ) ); ?>
 							</a>

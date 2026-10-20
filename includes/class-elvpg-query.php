@@ -131,7 +131,8 @@ class Elvpg_Query {
 			}
 
 			if ( ! is_string( $value ) ) {
-				continue; // Nested arrays and other types are ignored.
+				// Nested arrays and other types are ignored.
+				continue;
 			}
 
 			$value = trim( $value );
@@ -253,8 +254,9 @@ class Elvpg_Query {
 		$previous = 0;
 
 		foreach ( $pages as $page ) {
-			if ( $page - $previous === 2 ) {
-				$items[] = $page - 1; // A gap of one page: show the page itself instead of "…".
+			if ( 2 === $page - $previous ) {
+				// A gap of one page: show the page itself instead of "…".
+				$items[] = $page - 1;
 			} elseif ( $page - $previous > 2 ) {
 				$items[] = null;
 			}

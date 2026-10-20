@@ -145,7 +145,9 @@ Posts and terms that users added themselves stay in the database. This follows t
 **Decision.**
 - **Unit tests (PHPUnit 9.6, the last version that supports PHP 7.4)** for the query builder: categories only, tags only, both, empty input, invalid input. This covers the core rule of the brief. The tests do not load WordPress, so they run in milliseconds.
 - **Integration check during development:** every combination of up to two categories and up to two tags (319 combinations) was run through a real `WP_Query` and compared with the expected result computed by hand from the seeded data. It is a one-off script, not part of the repository: the unit tests guard the logic, and this check confirmed that WordPress reads the generated `tax_query` the way we expect.
-- **Linting:** WordPress Coding Standards via PHPCS; `wp-scripts lint-js` and `lint-style`.
+- **Linting:**
+  - PHP: PHPCS with the full `WordPress` ruleset (core, docs, extra: security, escaping, i18n, prefixes) and `PHPCompatibilityWP` for PHP 7.4+. The config is in `phpcs.xml.dist`. The result is 0 errors and 0 warnings. Each `phpcs:ignore` in the code names the rule and explains why it does not apply (for example, a public read-only GET form needs no nonce).
+  - JS and CSS: `wp-scripts lint-js` and `lint-style` with the WordPress configs.
 - **Manual checklist** in the README for the UI: filter combinations with expected results, pagination, no-JS mode, keyboard use, block placement in different orders.
 
 Full end-to-end tests were left out on purpose. They would add setup time and fragility without much extra confidence for a project of this size.

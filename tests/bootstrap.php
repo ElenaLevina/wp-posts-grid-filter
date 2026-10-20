@@ -6,6 +6,7 @@
  * @package ElvpgPostsGridFilter
  */
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Core constant, defined only for the unit tests.
 define( 'ABSPATH', __DIR__ . '/' );
 
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';

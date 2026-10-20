@@ -32,7 +32,8 @@ function elvpg_uninstall_site() {
 
 	foreach ( array_map( 'intval', $post_ids ) as $post_id ) {
 		if ( 'attachment' === get_post_type( $post_id ) ) {
-			wp_delete_attachment( $post_id, true ); // Also deletes the image files.
+			// Also deletes the image files.
+			wp_delete_attachment( $post_id, true );
 		} else {
 			wp_delete_post( $post_id, true );
 		}

@@ -24,7 +24,8 @@ $elvpg_current  = min( $elvpg_state['page'], max( 1, $elvpg_total ) );
 $elvpg_items    = Elvpg_Query::pagination_items( $elvpg_current, $elvpg_total );
 
 if ( empty( $elvpg_items ) ) {
-	return; // One page or no posts: nothing to paginate.
+	// One page or no posts: nothing to paginate.
+	return;
 }
 
 /**

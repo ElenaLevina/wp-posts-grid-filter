@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<ruleset name="ELVPG Posts Grid and Filter">
+	<description>WordPress Coding Standards for the plugin.</description>
+
+	<file>.</file>
+
+	<exclude-pattern>/build/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<!-- Full WordPress standard: core rules, documentation, security and performance checks. -->
+	<rule ref="WordPress"/>
+
+	<!-- The plugin's minimum WordPress version. Flags functions that are newer. -->
+	<config name="minimum_wp_version" value="6.5"/>
+
+	<!-- Every translatable string must use the plugin's text domain. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="elvpg-posts-grid-filter"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Everything in the global namespace must use the plugin prefix. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="elvpg"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Code must run on the minimum PHP version from the plugin header. -->
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Tests follow PHPUnit naming, not WordPress file and class naming. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment.MissingShort">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+</ruleset>

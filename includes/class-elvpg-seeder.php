@@ -224,37 +224,48 @@ class Elvpg_Seeder {
 	 */
 	private static function seed_posts( array $term_ids ) {
 		foreach ( self::posts() as $index => $post ) {
-			list( $title, $excerpt, $categories, $tags ) = $post;
+			self::seed_post( $index, $post, $term_ids );
+		}
+	}
 
-			$post_id = wp_insert_post(
-				array(
-					'post_type'    => Elvpg_Content_Types::post_type(),
-					'post_status'  => 'publish',
-					'post_title'   => $title,
-					'post_excerpt' => $excerpt,
-					'post_content' => '<!-- wp:paragraph --><p>' . esc_html( $excerpt ) . '</p><!-- /wp:paragraph -->',
-					// Spread dates so the default ordering (newest first) is stable.
-					'post_date'    => gmdate( 'Y-m-d H:i:s', time() - ( $index * DAY_IN_SECONDS ) ),
-					'meta_input'   => array( self::DEMO_META_KEY => 1 ),
-				),
-				true
-			);
+	/**
+	 * Creates one demo post with its terms and featured image.
+	 *
+	 * @param int                               $index    Position in the list, used for the date and the image.
+	 * @param array                             $post     Title, excerpt, category slugs, tag slugs.
+	 * @param array<string, array<string, int>> $term_ids Term IDs from seed_terms().
+	 */
+	private static function seed_post( $index, array $post, array $term_ids ) {
+		list( $title, $excerpt, $categories, $tags ) = $post;
 
-			if ( is_wp_error( $post_id ) ) {
-				continue;
-			}
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => Elvpg_Content_Types::post_type(),
+				'post_status'  => 'publish',
+				'post_title'   => $title,
+				'post_excerpt' => $excerpt,
+				'post_content' => '<!-- wp:paragraph --><p>' . esc_html( $excerpt ) . '</p><!-- /wp:paragraph -->',
+				// Spread dates so the default ordering (newest first) is stable.
+				'post_date'    => gmdate( 'Y-m-d H:i:s', time() - ( $index * DAY_IN_SECONDS ) ),
+				'meta_input'   => array( self::DEMO_META_KEY => 1 ),
+			),
+			true
+		);
 
-			$category_tax = Elvpg_Content_Types::category_taxonomy();
-			$tag_tax      = Elvpg_Content_Types::tag_taxonomy();
+		if ( is_wp_error( $post_id ) ) {
+			return;
+		}
 
-			wp_set_object_terms( $post_id, self::map_ids( $categories, $term_ids[ $category_tax ] ?? array() ), $category_tax );
-			wp_set_object_terms( $post_id, self::map_ids( $tags, $term_ids[ $tag_tax ] ?? array() ), $tag_tax );
+		$category_tax = Elvpg_Content_Types::category_taxonomy();
+		$tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 
-			$image_id = self::import_image( sprintf( 'demo-%02d.jpg', $index + 1 ), $post_id, $title );
+		wp_set_object_terms( $post_id, self::map_ids( $categories, $term_ids[ $category_tax ] ?? array() ), $category_tax );
+		wp_set_object_terms( $post_id, self::map_ids( $tags, $term_ids[ $tag_tax ] ?? array() ), $tag_tax );
 
-			if ( $image_id ) {
-				set_post_thumbnail( $post_id, $image_id );
-			}
+		$image_id = self::import_image( sprintf( 'demo-%02d.jpg', $index + 1 ), $post_id, $title );
+
+		if ( $image_id ) {
+			set_post_thumbnail( $post_id, $image_id );
 		}
 	}
 

@@ -89,7 +89,8 @@ class Elvpg_Content_Types {
 				'public'       => true,
 				'has_archive'  => false,
 				'menu_icon'    => 'dashicons-grid-view',
-				'show_in_rest' => true, // Required for the block editor and REST previews.
+				// Required for the block editor and the REST API previews.
+				'show_in_rest' => true,
 				'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 				'rewrite'      => array( 'slug' => 'grid-posts' ),
 			)

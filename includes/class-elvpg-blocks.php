@@ -20,7 +20,8 @@ class Elvpg_Blocks {
 		$block_files = glob( ELVPG_DIR . 'build/*/block.json' );
 
 		if ( empty( $block_files ) ) {
-			return; // Not built yet: run `npm run build`.
+			// Not built yet: run `npm run build`.
+			return;
 		}
 
 		foreach ( $block_files as $block_file ) {

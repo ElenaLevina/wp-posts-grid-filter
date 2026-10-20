@@ -112,7 +112,7 @@ $elvpg_wrapper = get_block_wrapper_attributes(
 		<?php endforeach; ?>
 
 		<div class="elvpg-filter__actions">
-			<?php // Hidden once JavaScript applies changes instantly (see style.scss). ?>
+			<?php /* Hidden once JavaScript applies changes instantly (see style.scss). */ ?>
 			<button type="submit" class="elvpg-filter__submit wp-element-button">
 				<?php esc_html_e( 'Apply filters', 'elvpg-posts-grid-filter' ); ?>
 			</button>
