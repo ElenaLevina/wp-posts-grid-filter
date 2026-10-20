@@ -23,6 +23,7 @@ require_once ELVPG_DIR . 'includes/class-elvpg-content-types.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-seeder.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-query.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-blocks.php';
+require_once ELVPG_DIR . 'includes/class-elvpg-empty-state.php';
 require_once ELVPG_DIR . 'includes/class-elvpg-demo-template.php';
 
 add_action( 'init', array( 'Elvpg_Content_Types', 'register' ) );

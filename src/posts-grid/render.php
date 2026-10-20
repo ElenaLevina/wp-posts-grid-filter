@@ -118,12 +118,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 			<?php endforeach; ?>
 		</ul>
 	<?php else : ?>
-		<p class="elvpg-grid__empty">
-			<?php esc_html_e( 'No posts match these filters.', 'elvpg-posts-grid-filter' ); ?>
-			<a href="<?php echo esc_url( Elvpg_Blocks::clear_filters_url() ); ?>" data-wp-on--click="actions.clearFilters">
-				<?php esc_html_e( 'Clear filters', 'elvpg-posts-grid-filter' ); ?>
-			</a>
-		</p>
+		<?php echo Elvpg_Empty_State::render( Elvpg_Query::current_state() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped inside Elvpg_Empty_State. ?>
 	<?php endif; ?>
 
 	<?php if ( '' !== trim( $content ) ) : ?>
