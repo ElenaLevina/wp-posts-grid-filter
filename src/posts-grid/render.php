@@ -24,7 +24,13 @@ $elvpg_region_id = Elvpg_Blocks::next_grid_region_id();
 
 // Server-side values of the client state, so directives render correctly
 // before JavaScript loads.
-wp_interactivity_state( 'elvpg/posts', array( 'isLoading' => false ) );
+wp_interactivity_state(
+	'elvpg/posts',
+	array(
+		'isLoading' => false,
+		'isSlow'    => false,
+	)
+);
 
 $elvpg_wrapper = get_block_wrapper_attributes(
 	array(
@@ -37,6 +43,7 @@ $elvpg_wrapper = get_block_wrapper_attributes(
 		'data-wp-context'           => wp_json_encode( array( 'regionId' => $elvpg_region_id ) ),
 		'data-wp-bind--aria-busy'   => 'state.isLoading',
 		'data-wp-class--is-loading' => 'state.isLoading',
+		'data-wp-class--is-slow'    => 'state.isSlow',
 		// Focus target after a page change (see view.js).
 		'tabindex'                  => '-1',
 	)

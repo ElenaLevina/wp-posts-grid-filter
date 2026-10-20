@@ -66,7 +66,13 @@ foreach ( $elvpg_groups as $elvpg_group ) {
 	$elvpg_counts[ $elvpg_group['param'] ] = count( $elvpg_group['selected'] );
 }
 
-wp_interactivity_state( 'elvpg/posts', array( 'isLoading' => false ) );
+wp_interactivity_state(
+	'elvpg/posts',
+	array(
+		'isLoading' => false,
+		'isSlow'    => false,
+	)
+);
 
 $elvpg_wrapper = get_block_wrapper_attributes(
 	array(

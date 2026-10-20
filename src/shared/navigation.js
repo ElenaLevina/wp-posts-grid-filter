@@ -16,11 +16,24 @@ export const PARAMS = {
 	page: 'elvpg_page',
 };
 
+/**
+ * Skeleton cards appear only if loading takes longer than this (ms). Most
+ * responses are faster, and grey blocks flashing on every click would be
+ * more distracting than helpful.
+ */
+const SKELETON_DELAY = 300;
+
+let pending = 0;
+let slowTimer = null;
+
 export const { state } = store( NAMESPACE, {
 	state: {
 		// True while the router is loading the next page. The grid shows it
 		// with aria-busy and a dimmed style.
 		isLoading: false,
+		// True when the loading takes longer than SKELETON_DELAY. The grid then
+		// shows skeleton cards instead of the old, no longer valid results.
+		isSlow: false,
 		// The current URL. Updated after every navigation, including the back
 		// and forward buttons, so the filter can keep its checkboxes in sync.
 		url: typeof window === 'undefined' ? '' : window.location.href,
@@ -68,12 +81,27 @@ export function filterUrl( categories, tags ) {
  * @param {string} url Target URL.
  */
 export function* navigateTo( url ) {
+	// Several navigations can overlap when the user clicks quickly. The
+	// loading state ends only when the last one has finished.
+	pending++;
 	state.isLoading = true;
+	if ( ! slowTimer ) {
+		slowTimer = window.setTimeout( () => {
+			state.isSlow = true;
+		}, SKELETON_DELAY );
+	}
+
 	try {
 		const { actions } = yield import( '@wordpress/interactivity-router' );
 		yield actions.navigate( url );
 	} finally {
-		state.isLoading = false;
+		pending--;
+		if ( pending === 0 ) {
+			window.clearTimeout( slowTimer );
+			slowTimer = null;
+			state.isLoading = false;
+			state.isSlow = false;
+		}
 		state.url = window.location.href;
 	}
 }

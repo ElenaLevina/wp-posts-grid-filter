@@ -338,3 +338,93 @@
 .elvpg-grid__inner {
 	margin-top: var(--elvpg-gap);
 }
+
+/* Loading state while the router fetches the next page. */
+
+// First moment: the old results are dimmed and cannot be clicked.
+.elvpg-grid.is-loading {
+	opacity: 0.55;
+	transition: opacity 0.2s;
+	pointer-events: none;
+}
+
+// After SKELETON_DELAY (see shared/navigation.js): the old cards turn into
+// skeleton cards. They are built from the existing card markup with CSS
+// only, so the layout does not jump and no extra markup is needed.
+.elvpg-grid.is-loading.is-slow {
+	// Not currentcolor: the text below is made transparent, and currentcolor
+	// is resolved on each element, so the blocks would turn white.
+	--elvpg-skeleton: color-mix(in srgb, var(--wp--preset--color--contrast, #111) 9%, var(--elvpg-surface));
+
+	opacity: 1;
+
+	.elvpg-grid__inner {
+		opacity: 0.55;
+	}
+
+	.elvpg-card__media {
+		background: var(--elvpg-skeleton);
+
+		img {
+			visibility: hidden;
+		}
+	}
+
+	.elvpg-card__categories,
+	.elvpg-card__title,
+	.elvpg-card__excerpt,
+	.elvpg-card__tag {
+		border-radius: 6px;
+		background: var(--elvpg-skeleton);
+		color: transparent;
+	}
+
+	.elvpg-card__title a {
+		color: transparent;
+		text-decoration: none;
+	}
+
+	.elvpg-card__categories {
+		width: 45%;
+	}
+
+	.elvpg-card__title {
+		width: 85%;
+	}
+
+	.elvpg-card__category-icon {
+		visibility: hidden;
+	}
+
+	// A light sweep moves across each card.
+	.elvpg-card__inner::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--elvpg-surface) 70%, transparent) 50%, transparent 70%);
+		animation: elvpg-skeleton-sweep 1.2s ease-in-out infinite;
+	}
+}
+
+@keyframes elvpg-skeleton-sweep {
+
+	from {
+		transform: translateX(-100%);
+	}
+
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.elvpg-grid.is-loading {
+		transition: none;
+	}
+
+	// Plain grey blocks, no moving sweep.
+	.elvpg-grid.is-loading.is-slow .elvpg-card__inner::after {
+		display: none;
+	}
+}
