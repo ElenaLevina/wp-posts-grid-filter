@@ -87,6 +87,7 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 						<div class="elvpg-card__body">
 							<?php if ( is_array( $elvpg_categories ) ) : ?>
 								<p class="elvpg-card__categories">
+									<span class="screen-reader-text"><?php esc_html_e( 'Categories:', 'elvpg-posts-grid-filter' ); ?> </span>
 									<?php echo esc_html( implode( ', ', wp_list_pluck( $elvpg_categories, 'name' ) ) ); ?>
 								</p>
 							<?php endif; ?>
@@ -98,9 +99,10 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 							<p class="elvpg-card__excerpt"><?php echo esc_html( get_the_excerpt( $elvpg_post ) ); ?></p>
 
 							<?php if ( is_array( $elvpg_tags ) ) : ?>
-								<ul class="elvpg-card__tags">
+								<ul class="elvpg-card__tags" aria-label="<?php esc_attr_e( 'Tags', 'elvpg-posts-grid-filter' ); ?>">
 									<?php foreach ( $elvpg_tags as $elvpg_tag ) : ?>
-										<li class="elvpg-card__tag"><?php echo esc_html( $elvpg_tag->name ); ?></li>
+										<?php /* Shown as a hashtag of the slug, for example #ai-tools. */ ?>
+										<li class="elvpg-card__tag">#<?php echo esc_html( $elvpg_tag->slug ); ?></li>
 									<?php endforeach; ?>
 								</ul>
 							<?php endif; ?>

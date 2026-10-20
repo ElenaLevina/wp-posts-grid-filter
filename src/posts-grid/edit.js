@@ -28,7 +28,7 @@ const TEMPLATE = [ [ 'elvpg/posts-pagination' ] ];
 export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { columns, postsPerPage } = attributes;
 
-	const { posts, isLoading, termNames, media } = useSelect(
+	const { posts, isLoading, termsById, media } = useSelect(
 		( select ) => {
 			const core = select( coreStore );
 			const query = {
@@ -68,8 +68,8 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					'getEntityRecords',
 					args
 				),
-				termNames: Object.fromEntries(
-					allTerms.map( ( term ) => [ term.id, term.name ] )
+				termsById: Object.fromEntries(
+					allTerms.map( ( term ) => [ term.id, term ] )
 				),
 				media: mediaById,
 			};
@@ -177,12 +177,12 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 									categories={ (
 										post[ SETTINGS.categoryRestBase ] ?? []
 									)
-										.map( ( id ) => termNames[ id ] )
+										.map( ( id ) => termsById[ id ]?.name )
 										.filter( Boolean ) }
 									tags={ (
 										post[ SETTINGS.tagRestBase ] ?? []
 									)
-										.map( ( id ) => termNames[ id ] )
+										.map( ( id ) => termsById[ id ]?.slug )
 										.filter( Boolean ) }
 								/>
 							) ) }

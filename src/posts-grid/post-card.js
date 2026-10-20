@@ -31,6 +31,13 @@ function imageUrl( image ) {
 	);
 }
 
+/**
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.post       Post record.
+ * @param {Object}   props.image      Media record of the featured image.
+ * @param {string[]} props.categories Category names.
+ * @param {string[]} props.tags       Tag slugs, shown as #slug.
+ */
 export default function PostCard( { post, image, categories, tags } ) {
 	const title = decodeEntities( post.title?.rendered ?? '' );
 	// Links do not navigate away from the editor.
@@ -71,7 +78,7 @@ export default function PostCard( { post, image, categories, tags } ) {
 						<ul className="elvpg-card__tags">
 							{ tags.map( ( tag ) => (
 								<li key={ tag } className="elvpg-card__tag">
-									{ tag }
+									#{ tag }
 								</li>
 							) ) }
 						</ul>
