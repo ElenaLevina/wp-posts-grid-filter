@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
  * Creates demo terms, posts (with featured images) and a demo page.
  *
  * Seeding is idempotent: everything it creates is marked with the
- * `_elvpg_demo` meta key, and a second activation does not duplicate content.
+ * `_elvpg_demo` meta key, and a second activation creates only what is missing.
  */
 class Elvpg_Seeder {
 
@@ -96,9 +96,7 @@ class Elvpg_Seeder {
 
 		$term_ids = self::seed_terms();
 
-		if ( ! self::has_demo_posts() ) {
-			self::seed_posts( $term_ids );
-		}
+		self::seed_posts( $term_ids );
 
 		self::seed_page();
 		self::reset_rewrite_rules();
@@ -165,6 +163,30 @@ class Elvpg_Seeder {
 			array( 'Custom Post Types and Taxonomies', 'Modelling content so editors and queries both stay simple.', array( 'development' ), array( 'php', 'gutenberg' ) ),
 			array( 'Prompting for Better Block Code', 'How to brief an AI assistant so the generated block follows your conventions.', array( 'development', 'design' ), array( 'ai-tools', 'gutenberg' ) ),
 			array( 'Semantic HTML for Screen Readers', 'Headings, landmarks and lists: the free accessibility wins in every template.', array( 'accessibility' ), array( 'seo', 'css' ) ),
+			array( 'Block Patterns for Faster Page Building', 'Ready-made layouts that editors can insert, change and reuse in seconds.', array( 'design', 'development' ), array( 'gutenberg', 'css' ) ),
+			array( 'Measuring INP in the Real World', 'Field data, long tasks and the event handlers that slow down every click.', array( 'performance' ), array( 'seo', 'react' ) ),
+			array( 'Accessible Forms in Custom Blocks', 'Labels, error messages and fieldsets that work with a keyboard and a screen reader.', array( 'accessibility', 'development' ), array( 'gutenberg', 'php' ) ),
+			array( 'Typography Scales with theme.json', 'Fluid font sizes and a clear type scale, defined once for the whole site.', array( 'design' ), array( 'css', 'gutenberg' ) ),
+			array( 'Caching Dynamic Blocks', 'Transients, object cache and when a dynamic block should not be cached at all.', array( 'performance', 'development' ), array( 'php' ) ),
+			array( 'Writing Alt Text That Helps', 'Describe the purpose of an image, not every pixel of it.', array( 'accessibility' ), array( 'seo' ) ),
+			array( 'Dynamic Blocks vs Client-Side Rendering', 'Where the markup is built changes speed, SEO and how much code you maintain.', array( 'development' ), array( 'react', 'php' ) ),
+			array( 'Color Contrast Checks in Code Review', 'Catch low-contrast text before it ships, with tools and a short checklist.', array( 'accessibility', 'design' ), array( 'css', 'ai-tools' ) ),
+			array( 'Less JavaScript in Block Themes', 'Ship interactivity only where it is needed and keep the rest as plain HTML.', array( 'performance' ), array( 'react', 'css' ) ),
+			array( 'Code Review with AI Assistants', 'What an assistant catches well, what it misses, and how to keep the human in charge.', array( 'development' ), array( 'ai-tools' ) ),
+			array( 'Designing Empty States', 'No results is still a screen: explain what happened and offer the next step.', array( 'design' ), array( 'css' ) ),
+			array( 'Interactivity API Basics', 'Directives, stores and server-rendered state for interactive blocks.', array( 'development', 'performance' ), array( 'gutenberg', 'react' ) ),
+			array( 'Skip Links and Landmarks', 'Let keyboard users jump past the header straight to the content.', array( 'accessibility' ), array( 'seo', 'css' ) ),
+			array( 'Loading Web Fonts Without Layout Shift', 'Preload, font-display and fallback metrics that keep the text steady.', array( 'performance', 'design' ), array( 'css', 'seo' ) ),
+			array( 'Testing PHP with PHPUnit', 'Small pure functions are the easiest code to test and to trust.', array( 'development' ), array( 'php' ) ),
+			array( 'Motion Design and Reduced Motion', 'Animations that help, and a quiet version for people who turn them off.', array( 'design', 'accessibility' ), array( 'css' ) ),
+			array( 'Custom REST API Endpoints', 'Routes, permission callbacks and schemas for data that blocks need.', array( 'development' ), array( 'php', 'react' ) ),
+			array( 'AI-Generated Images on Your Site', 'Licensing questions, alt text and when a real photo is still better.', array( 'design' ), array( 'ai-tools', 'seo' ) ),
+			array( 'Database Queries That Scale', 'Indexes, tax queries and avoiding slow meta queries on large sites.', array( 'performance', 'development' ), array( 'php' ) ),
+			array( 'Focus Styles Done Right', 'Visible, high-contrast focus indicators that match the design.', array( 'accessibility', 'design' ), array( 'css' ) ),
+			array( 'Structured Data for WordPress', 'Schema markup that helps search engines understand your content.', array( 'development' ), array( 'seo', 'php' ) ),
+			array( 'From Design Tokens to CSS Variables', 'Keep Figma and code in sync with one set of named values.', array( 'design' ), array( 'css', 'react' ) ),
+			array( 'Lighthouse Scores Are Not the Goal', 'Use lab scores as hints and real user data as the measure.', array( 'performance' ), array( 'seo' ) ),
+			array( 'Working with an AI Coding Agent', 'Small tasks, clear context and reviewing every change before it lands.', array( 'development' ), array( 'ai-tools', 'react' ) ),
 		);
 	}
 
@@ -199,22 +221,28 @@ class Elvpg_Seeder {
 	}
 
 	/**
-	 * Whether demo posts already exist (prevents duplicates on re-activation).
+	 * Titles of the demo posts that already exist on this site.
 	 *
-	 * @return bool
+	 * @return array<string, true> Title => true, for fast lookups.
 	 */
-	private static function has_demo_posts() {
-		$found = get_posts(
+	private static function existing_demo_titles() {
+		$ids = get_posts(
 			array(
 				'post_type'      => Elvpg_Content_Types::post_type(),
 				'post_status'    => 'any',
-				'posts_per_page' => 1,
+				'posts_per_page' => -1,
 				'fields'         => 'ids',
 				'meta_key'       => self::DEMO_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- One-time check on activation.
 			)
 		);
 
-		return ! empty( $found );
+		$titles = array();
+
+		foreach ( $ids as $id ) {
+			$titles[ get_the_title( $id ) ] = true;
+		}
+
+		return $titles;
 	}
 
 	/**
@@ -223,7 +251,15 @@ class Elvpg_Seeder {
 	 * @param array<string, array<string, int>> $term_ids Term IDs from seed_terms().
 	 */
 	private static function seed_posts( array $term_ids ) {
+		$existing = self::existing_demo_titles();
+
 		foreach ( self::posts() as $index => $post ) {
+			// Activating again creates only the posts that are missing, so a
+			// site seeded by an older version gets the new posts without duplicates.
+			if ( isset( $existing[ $post[0] ] ) ) {
+				continue;
+			}
+
 			self::seed_post( $index, $post, $term_ids );
 		}
 	}

@@ -120,7 +120,8 @@ The builder is a pure function (term IDs in, query args out), so it is covered b
 
 **Decision.**
 - Seeding runs in the activation hook. The post type is registered there explicitly, because `init` has already fired for that request.
-- Everything the plugin creates is marked with the `_elvpg_demo` meta key. Activating again does not create duplicates.
+- 36 demo posts (six pages with the default six posts per page), spread over 4 categories and 6 tags so that every filter combination gives a meaningful result, including some empty ones.
+- Everything the plugin creates is marked with the `_elvpg_demo` meta key. Activating again creates only the demo posts that are missing (matched by title), so there are no duplicates, and a site seeded by an older version of the plugin gets the new posts.
 - Featured images are bundled in `assets/seed/` and imported as real attachments with generated sizes and alt text. Activation needs no network access.
 - **Multisite.** On network activation the seeder runs on every site with `switch_to_blog()`. Sites created later get the demo content through the `wp_initialize_site` hook (priority 900, after core has created the site's tables).
 - **Rewrite rules on Multisite.** After `switch_to_blog()` the global `$wp_rewrite` still holds the permalink settings of the original site, so `flush_rewrite_rules()` would save wrong rules for the other sites. On a switched site the seeder deletes the `rewrite_rules` option instead, and WordPress rebuilds the rules on that site's next request.
