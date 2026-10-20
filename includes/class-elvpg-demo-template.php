@@ -74,6 +74,31 @@ class Elvpg_Demo_Template {
 	}
 
 	/**
+	 * Works around a WordPress core inconsistency. get_block_templates()
+	 * returns templates registered by plugins keyed by their id
+	 * ("elvpg-posts-grid-filter//elvpg-demo-page") instead of 0, 1, 2…, but
+	 * wp_get_post_content_block_attributes() in wp-includes/block-editor.php
+	 * reads the result as $templates[0]. On the edit screen of the demo page
+	 * that printed "Undefined array key 0" and three more PHP warnings.
+	 *
+	 * Only queries for this template are re-indexed; other results are left
+	 * as they are. Hooked to the `get_block_templates` filter.
+	 *
+	 * @param WP_Block_Template[] $templates Query result.
+	 * @param array               $query     Query arguments.
+	 * @return WP_Block_Template[]
+	 */
+	public static function reindex_query_result( $templates, $query ) {
+		$slugs = isset( $query['slug__in'] ) ? (array) $query['slug__in'] : array();
+
+		if ( in_array( self::SLUG, $slugs, true ) && is_array( $templates ) ) {
+			return array_values( $templates );
+		}
+
+		return $templates;
+	}
+
+	/**
 	 * In the editor, the page title field normally uses the theme's content
 	 * width, while the template puts the title in the 1280px column. For pages
 	 * with this template, the field gets the same width, so the editor looks

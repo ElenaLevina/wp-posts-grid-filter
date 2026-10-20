@@ -30,6 +30,7 @@ add_action( 'init', array( 'Elvpg_Content_Types', 'register' ) );
 add_action( 'init', array( 'Elvpg_Blocks', 'register' ) );
 add_action( 'init', array( 'Elvpg_Demo_Template', 'register' ) );
 add_action( 'enqueue_block_assets', array( 'Elvpg_Demo_Template', 'editor_title_width' ) );
+add_filter( 'get_block_templates', array( 'Elvpg_Demo_Template', 'reindex_query_result' ), 10, 2 );
 
 // Multisite: seed sites created after network activation. Priority 900 runs
 // after core has created the new site's tables and default content.
