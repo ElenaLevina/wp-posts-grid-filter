@@ -51,6 +51,7 @@
 }
 
 .elvpg-card__inner {
+	position: relative; // Containing block for the stretched title link.
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -58,6 +59,31 @@
 	border: 1px solid var(--elvpg-border);
 	border-radius: var(--elvpg-radius);
 	background: var(--elvpg-surface);
+	transition:
+		border-color 0.2s ease,
+		box-shadow 0.2s ease;
+
+	// The whole card reacts to the pointer, and to keyboard focus on its link.
+	&:hover,
+	&:has(.elvpg-card__title a:focus-visible) {
+		border-color: color-mix(in srgb, currentcolor 30%, transparent);
+		box-shadow: 0 10px 28px rgb(0 0 0 / 10%);
+
+		.elvpg-card__title a {
+			text-decoration: underline;
+			text-underline-offset: 0.15em;
+		}
+	}
+
+	// Keyboard focus is shown around the whole card, not only the title.
+	&:has(.elvpg-card__title a:focus-visible) {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 }
 
 .elvpg-card__media {
@@ -129,14 +155,23 @@
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
 
+	// Stretched link: the title link is the only link in the card, and its
+	// ::after covers the whole card, so a click anywhere opens the post.
+	// Screen readers still meet one link per card, named by the title.
 	a {
 		color: inherit;
 		text-decoration: none;
 
-		&:hover,
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset: 0;
+		}
+
+		// The card shows the focus ring instead (see .elvpg-card__inner).
 		&:focus-visible {
-			text-decoration: underline;
-			text-underline-offset: 0.15em;
+			outline: none;
 		}
 	}
 }

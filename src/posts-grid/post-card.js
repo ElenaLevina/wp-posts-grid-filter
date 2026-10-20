@@ -55,18 +55,10 @@ export default function PostCard( {
 		<li className="elvpg-card">
 			<article className="elvpg-card__inner">
 				{ image && (
-					<a
-						className="elvpg-card__media"
-						href={ post.link }
-						onClick={ stay }
-						tabIndex={ -1 }
-						aria-hidden="true"
-					>
-						<img
-							src={ imageUrl( image ) }
-							alt={ image.alt_text ?? '' }
-						/>
-					</a>
+					<div className="elvpg-card__media">
+						{ /* Empty alt: the title next to it already names the post. */ }
+						<img src={ imageUrl( image ) } alt="" />
+					</div>
 				) }
 				<div className="elvpg-card__body">
 					{ categories.length > 0 && (

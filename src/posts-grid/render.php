@@ -80,10 +80,25 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 				<li class="elvpg-card">
 					<article class="elvpg-card__inner">
 						<?php if ( has_post_thumbnail( $elvpg_post ) ) : ?>
-							<?php /* The title link is the main link. The image link is hidden from screen readers and the tab order, so it is not announced twice. */ ?>
-							<a class="elvpg-card__media" href="<?php echo esc_url( $elvpg_link ); ?>" tabindex="-1" aria-hidden="true">
-								<?php echo get_the_post_thumbnail( $elvpg_post, 'medium_large', array( 'loading' => 'lazy' ) ); ?>
-							</a>
+							<?php
+							/*
+							 * Not a link: the title link covers the whole card (see style.scss).
+							 * Empty alt: the image sits next to the title, so its alt text
+							 * would only make screen readers read the title twice.
+							 */
+							?>
+							<div class="elvpg-card__media">
+								<?php
+								echo get_the_post_thumbnail(
+									$elvpg_post,
+									'medium_large',
+									array(
+										'loading' => 'lazy',
+										'alt'     => '',
+									)
+								);
+								?>
+							</div>
 						<?php endif; ?>
 
 						<div class="elvpg-card__body">
