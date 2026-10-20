@@ -298,7 +298,7 @@ class Elvpg_Seeder {
 		wp_set_object_terms( $post_id, self::map_ids( $categories, $term_ids[ $category_tax ] ?? array() ), $category_tax );
 		wp_set_object_terms( $post_id, self::map_ids( $tags, $term_ids[ $tag_tax ] ?? array() ), $tag_tax );
 
-		$image_id = self::import_image( sprintf( 'demo-%02d.jpg', $index + 1 ), $post_id, $title );
+		$image_id = self::import_image( sprintf( 'demo-%02d.webp', $index + 1 ), $post_id, $title );
 
 		if ( $image_id ) {
 			set_post_thumbnail( $post_id, $image_id );
@@ -340,7 +340,7 @@ class Elvpg_Seeder {
 
 		$attachment_id = wp_insert_attachment(
 			array(
-				'post_mime_type' => 'image/jpeg',
+				'post_mime_type' => wp_check_filetype( $upload['file'] )['type'],
 				'post_title'     => $title,
 				'post_status'    => 'inherit',
 			),
@@ -372,24 +372,30 @@ class Elvpg_Seeder {
 			return;
 		}
 
+		// The plugin's page template puts the title and the content in one
+		// 1280px column (see Elvpg_Demo_Template). Without it the page uses the
+		// theme's default template. The content is the same in both cases.
+		$template = Elvpg_Demo_Template::register() ? Elvpg_Demo_Template::SLUG : '';
+
 		$content = implode(
 			"\n\n",
 			array(
 				'<!-- wp:heading --><h2 class="wp-block-heading">' . esc_html__( 'Explore the posts', 'elvpg-posts-grid-filter' ) . '</h2><!-- /wp:heading -->',
 				'<!-- wp:elvpg/posts-filter /-->',
 				'<!-- wp:paragraph --><p>' . esc_html__( 'The filter above and the grid below are independent blocks. Move either one anywhere on the page and they still stay in sync.', 'elvpg-posts-grid-filter' ) . '</p><!-- /wp:paragraph -->',
-				'<!-- wp:elvpg/posts-grid {"columns":3,"postsPerPage":6,"align":"wide"} -->' . "\n" . '<!-- wp:elvpg/posts-pagination /-->' . "\n" . '<!-- /wp:elvpg/posts-grid -->',
+				'<!-- wp:elvpg/posts-grid {"columns":4,"postsPerPage":8} -->' . "\n" . '<!-- wp:elvpg/posts-pagination /-->' . "\n" . '<!-- /wp:elvpg/posts-grid -->',
 			)
 		);
 
 		$page_id = wp_insert_post(
 			array(
-				'post_type'    => 'page',
-				'post_status'  => 'publish',
-				'post_title'   => __( 'Posts Grid & Filter Demo', 'elvpg-posts-grid-filter' ),
-				'post_name'    => 'elvpg-demo',
-				'post_content' => $content,
-				'meta_input'   => array( self::DEMO_META_KEY => 1 ),
+				'post_type'     => 'page',
+				'post_status'   => 'publish',
+				'post_title'    => __( 'Posts Grid & Filter Demo', 'elvpg-posts-grid-filter' ),
+				'post_name'     => 'elvpg-demo',
+				'post_content'  => $content,
+				'page_template' => $template,
+				'meta_input'    => array( self::DEMO_META_KEY => 1 ),
 			),
 			true
 		);

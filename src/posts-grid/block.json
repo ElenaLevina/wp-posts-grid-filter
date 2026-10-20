@@ -17,6 +17,10 @@
 		"postsPerPage": {
 			"type": "number",
 			"default": 6
+		},
+		"titleLevel": {
+			"type": "number",
+			"default": 3
 		}
 	},
 	"providesContext": {

@@ -37,8 +37,16 @@ function imageUrl( image ) {
  * @param {Object}   props.image      Media record of the featured image.
  * @param {string[]} props.categories Category names.
  * @param {string[]} props.tags       Tag slugs, shown as #slug.
+ * @param {number}   props.titleLevel Heading level of the title, 2–6.
  */
-export default function PostCard( { post, image, categories, tags } ) {
+export default function PostCard( {
+	post,
+	image,
+	categories,
+	tags,
+	titleLevel = 3,
+} ) {
+	const TitleTag = `h${ titleLevel }`;
 	const title = decodeEntities( post.title?.rendered ?? '' );
 	// Links do not navigate away from the editor.
 	const stay = ( event ) => event.preventDefault();
@@ -63,14 +71,24 @@ export default function PostCard( { post, image, categories, tags } ) {
 				<div className="elvpg-card__body">
 					{ categories.length > 0 && (
 						<p className="elvpg-card__categories">
-							{ categories.join( ', ' ) }
+							<svg
+								className="elvpg-card__category-icon"
+								viewBox="0 0 24 24"
+								width="14"
+								height="14"
+								aria-hidden="true"
+								focusable="false"
+							>
+								<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" />
+							</svg>
+							<span>{ categories.join( ', ' ) }</span>
 						</p>
 					) }
-					<h3 className="elvpg-card__title">
+					<TitleTag className="elvpg-card__title">
 						<a href={ post.link } onClick={ stay }>
 							{ title }
 						</a>
-					</h3>
+					</TitleTag>
 					<p className="elvpg-card__excerpt">
 						{ toText( post.excerpt?.rendered ) }
 					</p>

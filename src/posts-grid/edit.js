@@ -8,6 +8,8 @@
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
+	BlockControls,
+	HeadingLevelDropdown,
 	InnerBlocks,
 	InspectorControls,
 	store as blockEditorStore,
@@ -26,7 +28,7 @@ const ALLOWED_BLOCKS = [ 'elvpg/posts-pagination' ];
 const TEMPLATE = [ [ 'elvpg/posts-pagination' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { columns, postsPerPage } = attributes;
+	const { columns, postsPerPage, titleLevel } = attributes;
 
 	const { posts, isLoading, termsById, media } = useSelect(
 		( select ) => {
@@ -101,14 +103,28 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
+			<BlockControls group="block">
+				{ /* Same control as the core Heading block: the right level depends on the page outline. */ }
+				<HeadingLevelDropdown
+					options={ [ 2, 3, 4, 5, 6 ] }
+					value={ titleLevel }
+					onChange={ ( value ) =>
+						setAttributes( { titleLevel: value } )
+					}
+				/>
+			</BlockControls>
+
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout', 'elvpg-posts-grid-filter' ) }>
 					<RangeControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
-						label={ __( 'Columns', 'elvpg-posts-grid-filter' ) }
+						label={ __(
+							'Maximum columns',
+							'elvpg-posts-grid-filter'
+						) }
 						help={ __(
-							'On small screens the grid uses fewer columns automatically.',
+							'If the grid is too narrow for this number of columns (on phones, in a sidebar or in a narrow content area), it shows fewer, so the cards never get too thin. Set the alignment to Wide for more space.',
 							'elvpg-posts-grid-filter'
 						) }
 						value={ columns }
@@ -172,6 +188,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 							{ posts.map( ( post ) => (
 								<PostCard
 									key={ post.id }
+									titleLevel={ titleLevel }
 									post={ post }
 									image={ media[ post.featured_media ] }
 									categories={ (

@@ -16,7 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 $elvpg_per_page = Elvpg_Query::clamp_per_page( $attributes['postsPerPage'] ?? Elvpg_Query::DEFAULT_PER_PAGE );
 $elvpg_columns  = min( 4, max( 2, (int) ( $attributes['columns'] ?? 3 ) ) );
-$elvpg_query    = Elvpg_Query::get_posts( $elvpg_per_page );
+// Heading level of the post titles: h2–h6, h3 by default (see ADR-003).
+$elvpg_title_tag = 'h' . min( 6, max( 2, (int) ( $attributes['titleLevel'] ?? 3 ) ) );
+$elvpg_query     = Elvpg_Query::get_posts( $elvpg_per_page );
 
 $elvpg_region_id = Elvpg_Blocks::next_grid_region_id();
 
@@ -87,14 +89,18 @@ $elvpg_tag_tax      = Elvpg_Content_Types::tag_taxonomy();
 						<div class="elvpg-card__body">
 							<?php if ( is_array( $elvpg_categories ) ) : ?>
 								<p class="elvpg-card__categories">
-									<span class="screen-reader-text"><?php esc_html_e( 'Categories:', 'elvpg-posts-grid-filter' ); ?> </span>
-									<?php echo esc_html( implode( ', ', wp_list_pluck( $elvpg_categories, 'name' ) ) ); ?>
+									<?php /* A folder icon marks categories, a # marks tags. The icon is decorative; screen readers hear "Categories:". */ ?>
+									<svg class="elvpg-card__category-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/></svg>
+									<span>
+										<span class="screen-reader-text"><?php esc_html_e( 'Categories:', 'elvpg-posts-grid-filter' ); ?> </span>
+										<?php echo esc_html( implode( ', ', wp_list_pluck( $elvpg_categories, 'name' ) ) ); ?>
+									</span>
 								</p>
 							<?php endif; ?>
 
-							<h3 class="elvpg-card__title">
+							<<?php echo esc_attr( $elvpg_title_tag ); ?> class="elvpg-card__title">
 								<a href="<?php echo esc_url( $elvpg_link ); ?>"><?php echo esc_html( get_the_title( $elvpg_post ) ); ?></a>
-							</h3>
+							</<?php echo esc_attr( $elvpg_title_tag ); ?>>
 
 							<p class="elvpg-card__excerpt"><?php echo esc_html( get_the_excerpt( $elvpg_post ) ); ?></p>
 
