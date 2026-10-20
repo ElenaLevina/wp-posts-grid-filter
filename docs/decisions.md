@@ -110,6 +110,7 @@ The builder is a pure function (term IDs in, query args out), so it is covered b
 - The form keeps the other parameters of the current URL as hidden fields. Without this, with plain permalinks (`?page_id=…`) a no-JS submit would leave the page.
 - The checkboxes are native inputs styled as chips, so keyboard and screen reader support comes from the browser. Focus stays on the checkbox after a change.
 - Pagination is a `<nav>` with real links and `aria-current="page"`. Ctrl/Cmd-click still opens a page in a new tab.
+- Pagination always fits one row. The server prints two lists of page numbers: a full one (`1 … 4 [5] 6 … 10`) and a short one (`1 … [5] … 10`, at most 5 items). A CSS container query shows the short list and turns "Previous"/"Next" into arrows when the pagination itself is narrower than 30rem. A container query, not a media query, so it also works when the grid sits in a narrow column on a wide screen. The arrow labels stay available to screen readers. On the first and last page the arrow is an inactive placeholder, hidden from screen readers.
 - After a client-side update, a polite `aria-live` region announces the result ("4 posts found. Page 1 of 2."). When the page changes, focus moves to the top of the grid, so keyboard users do not stay at the bottom.
 - While the next page loads, the grid has `aria-busy="true"` and is dimmed. Smooth scrolling is turned off for users who prefer reduced motion.
 - Empty state: "No posts match these filters" with a "Clear filters" link.

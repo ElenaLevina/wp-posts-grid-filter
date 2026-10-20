@@ -3,14 +3,63 @@
  *
  * "Posts per page" comes from the parent grid through block context, so the
  * preview shows the real number of pages and updates when the grid setting
- * changes. The links do not navigate in the editor.
+ * changes. It mirrors render.php: the same classes and the same two lists of
+ * page numbers, so the container query works in the editor too.
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 import { SETTINGS } from '../posts-grid/constants';
+import paginationItems from './items';
+
+const CURRENT = 1;
+
+function Icon( { path } ) {
+	return (
+		<svg
+			className="elvpg-pagination__icon"
+			viewBox="0 0 24 24"
+			width="20"
+			height="20"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<path d={ path } />
+		</svg>
+	);
+}
+
+function Pages( { layout, items } ) {
+	return (
+		<ul className={ `elvpg-pagination__pages is-${ layout }` }>
+			{ items.map( ( item, index ) =>
+				item === null ? (
+					<li
+						key={ `gap-${ index }` }
+						className="elvpg-pagination__gap"
+						aria-hidden="true"
+					>
+						…
+					</li>
+				) : (
+					<li key={ item }>
+						<span
+							className={
+								item === CURRENT
+									? 'elvpg-pagination__link is-current'
+									: 'elvpg-pagination__link'
+							}
+						>
+							{ item }
+						</span>
+					</li>
+				)
+			) }
+		</ul>
+	);
+}
 
 export default function Edit( { context } ) {
 	const perPage = context[ 'elvpg/postsPerPage' ] ?? 6;
@@ -45,37 +94,28 @@ export default function Edit( { context } ) {
 			{ ...blockProps }
 			aria-label={ __( 'Posts pagination', 'elvpg-posts-grid-filter' ) }
 		>
-			<ul className="elvpg-pagination__list">
-				{ Array.from(
-					{ length: pages },
-					( _, index ) => index + 1
-				).map( ( page ) => (
-					<li key={ page }>
-						<span
-							className={
-								page === 1
-									? 'elvpg-pagination__link is-current'
-									: 'elvpg-pagination__link'
-							}
-							aria-current={ page === 1 ? 'page' : undefined }
-						>
-							{ page }
-						</span>
-					</li>
-				) ) }
-				<li>
-					<span className="elvpg-pagination__link elvpg-pagination__next">
+			<div className="elvpg-pagination__row">
+				<span className="elvpg-pagination__link elvpg-pagination__step is-prev is-disabled">
+					<Icon path="M15 18l-6-6 6-6" />
+					<span className="elvpg-pagination__step-label">
+						{ __( 'Previous', 'elvpg-posts-grid-filter' ) }
+					</span>
+				</span>
+				<Pages
+					layout="wide"
+					items={ paginationItems( CURRENT, pages, 1 ) }
+				/>
+				<Pages
+					layout="narrow"
+					items={ paginationItems( CURRENT, pages, 0 ) }
+				/>
+				<span className="elvpg-pagination__link elvpg-pagination__step is-next">
+					<span className="elvpg-pagination__step-label">
 						{ __( 'Next', 'elvpg-posts-grid-filter' ) }
 					</span>
-				</li>
-			</ul>
-			<p className="screen-reader-text">
-				{ sprintf(
-					/* translators: %d: number of pages. */
-					__( 'Preview of %d pages.', 'elvpg-posts-grid-filter' ),
-					pages
-				) }
-			</p>
+					<Icon path="M9 6l6 6-6 6" />
+				</span>
+			</div>
 		</nav>
 	);
 }

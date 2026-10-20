@@ -172,4 +172,37 @@ class QueryTest extends TestCase {
 			'page beyond the end'    => array( 99, 10, array( 1, null, 9, 10 ) ),
 		);
 	}
+
+	/**
+	 * Narrow layout: no neighbours, so the list fits one row on a phone.
+	 *
+	 * @dataProvider narrow_pagination_cases
+	 *
+	 * @param int   $current  Current page.
+	 * @param int   $total    Total pages.
+	 * @param array $expected Expected items, null is a gap.
+	 */
+	public function test_narrow_pagination_items( $current, $total, $expected ) {
+		$this->assertSame( $expected, Elvpg_Query::pagination_items( $current, $total, 0 ) );
+	}
+
+	public function narrow_pagination_cases() {
+		return array(
+			'five pages show all'    => array( 3, 5, array( 1, 2, 3, 4, 5 ) ),
+			'first of six'           => array( 1, 6, array( 1, null, 6 ) ),
+			'middle of six'          => array( 4, 6, array( 1, null, 4, null, 6 ) ),
+			'middle of fifty'        => array( 25, 50, array( 1, null, 25, null, 50 ) ),
+			'last of fifty'          => array( 50, 50, array( 1, null, 50 ) ),
+			'gap of one stays a gap' => array( 3, 50, array( 1, null, 3, null, 50 ) ),
+			'next to the first'      => array( 2, 50, array( 1, 2, null, 50 ) ),
+		);
+	}
+
+	public function test_narrow_list_never_has_more_than_five_items() {
+		foreach ( array( 6, 7, 10, 50 ) as $total ) {
+			for ( $current = 1; $current <= $total; $current++ ) {
+				$this->assertLessThanOrEqual( 5, count( Elvpg_Query::pagination_items( $current, $total, 0 ) ), "Page $current of $total" );
+			}
+		}
+	}
 }

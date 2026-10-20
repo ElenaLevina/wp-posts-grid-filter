@@ -226,38 +226,53 @@ class Elvpg_Query {
 	 * Which page numbers the pagination shows.
 	 *
 	 * Short lists show every page. Long lists show the first and last page,
-	 * the current page with one neighbour on each side, and a gap (null)
-	 * where pages are skipped: 1 … 4 5 6 … 10.
+	 * the current page with its neighbours, and a gap (null) where pages are
+	 * skipped.
 	 *
-	 * @param int $current Current page.
-	 * @param int $total   Total number of pages.
+	 * - 1 neighbour (wide layout): 1 … 4 [5] 6 … 10. A gap of exactly one page
+	 *   shows that page instead of "…": it takes about the same space and is
+	 *   a useful link.
+	 * - 0 neighbours (narrow layout): 1 … [5] … 10. Gaps are always "…",
+	 *   because "…" is narrower than a button and the row must fit a phone.
+	 *   Never more than 5 items.
+	 *
+	 * @param int $current    Current page.
+	 * @param int $total      Total number of pages.
+	 * @param int $neighbours Pages shown on each side of the current page.
 	 * @return array<int|null> Page numbers; null marks a gap.
 	 */
-	public static function pagination_items( $current, $total ) {
-		$total   = max( 0, (int) $total );
-		$current = min( max( 1, (int) $current ), max( 1, $total ) );
+	public static function pagination_items( $current, $total, $neighbours = 1 ) {
+		$total      = max( 0, (int) $total );
+		$current    = min( max( 1, (int) $current ), max( 1, $total ) );
+		$neighbours = max( 0, (int) $neighbours );
 
-		if ( $total <= 7 ) {
-			return $total > 1 ? range( 1, $total ) : array();
+		if ( $total < 2 ) {
+			return array();
 		}
 
-		$pages = array_unique( array( 1, $current - 1, $current, $current + 1, $total ) );
-		$pages = array_filter(
-			$pages,
-			static function ( $page ) use ( $total ) {
-				return $page >= 1 && $page <= $total;
+		// Up to this length the full list is not longer than the shortened one.
+		if ( $total <= 5 + 2 * $neighbours ) {
+			return range( 1, $total );
+		}
+
+		$pages = array( 1, $total );
+
+		for ( $page = $current - $neighbours; $page <= $current + $neighbours; $page++ ) {
+			if ( $page >= 1 && $page <= $total ) {
+				$pages[] = $page;
 			}
-		);
+		}
+
+		$pages = array_unique( $pages );
 		sort( $pages );
 
 		$items    = array();
 		$previous = 0;
 
 		foreach ( $pages as $page ) {
-			if ( 2 === $page - $previous ) {
-				// A gap of one page: show the page itself instead of "…".
+			if ( 2 === $page - $previous && $neighbours > 0 ) {
 				$items[] = $page - 1;
-			} elseif ( $page - $previous > 2 ) {
+			} elseif ( $page - $previous >= 2 ) {
 				$items[] = null;
 			}
 
