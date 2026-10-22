@@ -228,6 +228,12 @@ Testing approach ([ADR-009](docs/decisions.md#adr-009--testing-strategy)):
 
 I used Claude Code as a pair programmer: I made the architecture decisions, reviewed and tested every change. The decision records in `docs/decisions.md` were written along the way, and the commit history shows the work step by step.
 
+The Claude Code setup is part of the repository, so the same rules apply to anyone who works on the plugin with it:
+
+- `CLAUDE.md` — the architecture map, the invariants to keep (the URL as the single source of truth, mirrored PHP/JS markup, PHP 7.4 compatibility) and the commands.
+- `.claude/settings.json` — allowed commands (build, lints, tests), commands that need confirmation (`git commit`, `git push`) and blocked ones (deleting the plugin inside wp-env).
+- `.claude/skills/` — `/feature` (plan → implement → test → document), `/verify` (all checks), `/adr` (a new decision record), `/release` (build and check the zip).
+
 ## License
 
 GPL-2.0-or-later

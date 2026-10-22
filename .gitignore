@@ -8,3 +8,6 @@ vendor/
 .phpunit.result.cache
 # Local wp-env settings, for example "phpVersion": "7.4" for a compatibility check.
 .wp-env.override.json
+# Personal Claude Code settings (the shared ones are in .claude/settings.json and CLAUDE.md).
+.claude/settings.local.json
+CLAUDE.local.md

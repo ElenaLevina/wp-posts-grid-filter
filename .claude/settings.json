@@ -1,0 +1,38 @@
+{
+	"$schema": "https://json.schemastore.org/claude-code-settings.json",
+	"permissions": {
+		"allow": [
+			"Bash(npm run build)",
+			"Bash(npm run lint:*)",
+			"Bash(npm run test:php)",
+			"Bash(npm run release)",
+			"Bash(npx @wordpress/env run cli wp post list *)",
+			"Bash(npx @wordpress/env run cli wp term list *)",
+			"Bash(npx @wordpress/env run cli wp plugin list *)",
+			"Bash(npx @wordpress/env run cli wp option get *)",
+			"Bash(git status *)",
+			"Bash(git diff *)",
+			"Bash(git log *)",
+			"Bash(unzip -l *)"
+		],
+		"ask": [
+			"Bash(git add *)",
+			"Bash(git commit *)",
+			"Bash(git push *)",
+			"Bash(npm install *)",
+			"Bash(composer *)",
+			"Bash(npx @wordpress/env run cli wp plugin uninstall *)"
+		],
+		"deny": [
+			"Bash(npx @wordpress/env run cli wp plugin delete *)",
+			"Bash(npx @wordpress/env destroy *)",
+			"Bash(rm -rf *)",
+			"Bash(git push --force *)",
+			"Bash(git reset --hard *)"
+		]
+	},
+	"attribution": {
+		"commit": "",
+		"pr": ""
+	}
+}
